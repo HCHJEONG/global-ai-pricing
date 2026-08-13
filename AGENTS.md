@@ -16,3 +16,12 @@ Before making UI changes in this repository, read and follow `DESIGN.md`.
 - Do not refactor unrelated UI while fixing a specific screen.
 - Build and deployment are handled manually by the maintainer. Do not run production builds or deploy commands unless the user explicitly requests them.
 - When changing frontend behavior, verify light mode, dark mode, narrow desktop, and mobile-relevant layout assumptions when feasible.
+
+## AWS / SSH Operations
+
+- Use the existing Bastion path for AWS private instance inspection: `ssh -i ~/.ssh/penvotkeypair1.pem ubuntu@43.202.136.180`.
+- From the Bastion, use the existing internal SSH aliases such as `t3a` and `yws` when the user asks to inspect private AWS EC2 instances.
+- Do not create or modify SSH keys.
+- Prefer read-only inspection commands first, such as `hostname`, `uptime`, `free -m`, `df -h /`, `docker ps`, and `docker system df`.
+- Do not stop, remove, prune, restart, or deploy containers on AWS unless the user explicitly requests that operation.
+- Do not copy secrets, private keys, full environment files, or credential contents into repository documents or final responses.

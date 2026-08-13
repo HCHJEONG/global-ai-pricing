@@ -19,6 +19,7 @@
 
 # production
 /build
+*.tar
 
 # misc
 .DS_Store
@@ -33,6 +34,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
+gcp-key.json
+.fordeploy/aws-backup/.env.local
+.fordeploy/aws-backup/gcp-key.json
 
 # local data and generated artifacts
 /data/
