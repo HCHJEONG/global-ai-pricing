@@ -5,7 +5,7 @@ Before making UI changes in this repository, read and follow `DESIGN.md`.
 ## Frontend Rules
 
 - Preserve dark mode, mobile responsiveness, and five-language support: Arabic, English, Japanese, Chinese, and Korean.
-- Prefer locale-aware routes such as `ko/`, `en/`, `ar/`, `jp/`, and `cn/` while keeping shared UI text in i18n translation keys instead of duplicating whole pages per language.
+- Prefer locale-aware routes such as `ko/`, `en/`, `ar/`, `ja/`, and `zh/` while keeping shared UI text in i18n translation keys instead of duplicating whole pages per language. Use country or market codes such as `jp` and `cn` only for market-specific data, not language routes.
 - Prefer existing project patterns over one-off style patches.
 - If a UI change needs repeated styles, create or reuse a small local wrapper instead of copying long style objects.
 - Use `RadioGroup` for mutually exclusive choices and `Checkbox` only for independent boolean choices.
