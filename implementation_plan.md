@@ -808,6 +808,413 @@ The deterministic Pricing Engine and most automated tests must run against store
 - Add Playwright critical-path tests
 - Add error handling and structured logs
 
+### One-turn implementation units
+
+The following units should be small enough for one focused implementation turn. Each unit should leave the repository in a coherent state with a clear verification step.
+
+#### Unit 0 — Repository baseline check
+
+Goal: understand the existing project shape before adding dependencies or files.
+
+- Inspect package manager, Next.js version, TypeScript config, app directory, styling setup, and test setup.
+- Record whether Tailwind, shadcn/ui, Drizzle, Vitest, Playwright, and i18n already exist.
+- Do not refactor or install anything in this unit.
+
+Regression / verification:
+
+Agent can run:
+
+- Summarize existing structure and the next safest setup step.
+
+Needs maintainer/manual:
+
+- None expected unless the implementation reveals an unclear product requirement.
+
+#### Unit 1 — App and tooling foundation
+
+Goal: establish the minimum app/tooling baseline required by the plan.
+
+- Add or confirm TypeScript strict mode.
+- Add or confirm Tailwind CSS and shadcn/ui setup.
+- Add or confirm lint/test scripts.
+- Add basic environment variable documentation.
+
+Regression / verification:
+
+Agent can run:
+
+- Run the lightest available static check or explain why none exists yet.
+
+Needs maintainer/manual:
+
+- None expected unless the implementation reveals an unclear product requirement.
+
+#### Unit 2 — Domain type skeleton
+
+Goal: create the pricing domain vocabulary without implementing the full calculation.
+
+- Add `Money`, `Rate`, `CurrencyCode`, `CountryCode`, `ExchangeRate`, `PricingInput`, `PricingResult`, and breakdown/warning/assumption types.
+- Keep these types independent from Next.js, Drizzle, Gemini, and UI code.
+- Add small constructor or validation helpers only if they reduce ambiguity.
+
+Regression / verification:
+
+Agent can run:
+
+- Typecheck or add a minimal domain test that imports the types.
+
+Needs maintainer/manual:
+
+- None expected unless the implementation reveals an unclear product requirement.
+
+#### Unit 3 — Decimal money utilities
+
+Goal: make money calculations safe before writing pricing formulas.
+
+- Add a decimal arithmetic library or project-approved decimal helper.
+- Implement money addition, multiplication by rate, currency assertion, and formatting boundary helpers.
+- Avoid JavaScript floating-point arithmetic for business money calculations.
+
+Regression / verification:
+
+Agent can run:
+
+- Add tests for decimal precision, currency mismatch, and minor-unit formatting assumptions.
+
+Needs maintainer/manual:
+
+- None expected unless the implementation reveals an unclear product requirement.
+
+#### Unit 4 — Seeded rule fixtures
+
+Goal: create stable input data for the first calculation without a database dependency.
+
+- Add fixture data for countries, currencies, exchange rate, Korea VAT, tariff estimate, shipping rule, and pricing policy.
+- Include source timestamp and version identifiers where relevant.
+- Mark customs/tariff results as estimates, not official determinations.
+
+Regression / verification:
+
+Agent can run:
+
+- Add a test that loads the fixtures and validates required fields.
+
+Needs maintainer/manual:
+
+- Confirm that seeded tax, tariff, shipping, margin, and exchange-rate assumptions are acceptable for a portfolio demo.
+- Confirm any legal or customs wording that should be shown as an estimate rather than official advice.
+
+#### Unit 5 — UNIQLO product fixture
+
+Goal: model the first public product source as stored sample data.
+
+- Add a stored UNIQLO US product fixture for product ID `456009`.
+- Preserve source URL, observed values, observed timestamp, adapter version, and raw extracted fields.
+- Add a normalized source-product type if it was not added earlier.
+
+Regression / verification:
+
+Agent can run:
+
+- Add a test that normalizes the fixture into the expected product shape.
+
+Needs maintainer/manual:
+
+- Confirm the chosen public product is still the intended first demonstration product.
+- Confirm that stored sample data is acceptable for the initial demo instead of live collection.
+
+#### Unit 6 — Pricing calculation pipeline
+
+Goal: produce a deterministic estimated landed price from fixture inputs.
+
+- Implement the first calculation pipeline: product cost, shipping, exchange-rate conversion, tariff estimate, VAT estimate, margin, and rounding.
+- Return recommended price, breakdown, assumptions, warnings, engine version, policy version, and calculated timestamp.
+- Keep the engine pure and independent from persistence, AI, and UI.
+
+Regression / verification:
+
+Agent can run:
+
+- Add unit tests for the first Korea destination scenario and at least one rounding or stale-data warning case.
+
+Needs maintainer/manual:
+
+- Review whether the first calculation order and rounding policy match the intended portfolio narrative.
+- Confirm visible caveats for estimated tariff/customs behavior.
+
+#### Unit 7 — Pricing application service
+
+Goal: expose pricing through a small server-side use case.
+
+- Add an application service that loads fixture inputs and calls the pricing engine.
+- Validate input parameters with Zod where external input is accepted.
+- Return a UI-ready result shape without leaking infrastructure details.
+
+Regression / verification:
+
+Agent can run:
+
+- Add a service-level test or a small route-handler test if the framework setup supports it.
+
+Needs maintainer/manual:
+
+- None expected unless the implementation reveals an unclear product requirement.
+
+#### Unit 8 — Minimal pricing UI
+
+Goal: show the first end-to-end result on screen.
+
+- Add a dashboard or pricing page under the locale-aware route structure.
+- Show product, source market, destination market, recommended price, breakdown, assumptions, warnings, source timestamp, and policy/engine version.
+- Follow `DESIGN.md`: Neo Brutal Data Utility, compact data panels, strong borders, dark mode, mobile responsiveness.
+
+Regression / verification:
+
+Agent can run:
+
+- Run the dev server or render check if available.
+- Inspect desktop and mobile layout when feasible.
+
+Needs maintainer/manual:
+
+- Review the screen visually for the intended Neo Brutal Data Utility style.
+- Confirm that the displayed breakdown is understandable to non-engineering readers.
+
+#### Unit 9 — Locale routing and translation shell
+
+Goal: make the UI ready for five-language support without translating every string in the first pass.
+
+- Add or confirm locale-aware routes for `ko`, `en`, `ja`, `zh`, and `ar`.
+- Add shared translation keys for the pricing page shell.
+- Ensure `ja` and `zh` are language routes, while `jp` and `cn` remain market/country codes only.
+- Add basic RTL direction handling for Arabic.
+
+Regression / verification:
+
+Agent can run:
+
+- Visit or test all locale routes.
+- Check that Arabic route sets RTL direction.
+
+Needs maintainer/manual:
+
+- Review sample translations for tone and terminology.
+- Confirm Arabic RTL layout manually if automated visual coverage is incomplete.
+
+#### Unit 10 — Persistence schema skeleton
+
+Goal: introduce database structure without mixing it into domain logic.
+
+- Add Drizzle and SQLite setup if not already present.
+- Define core tables only: products, brands, variants, countries, currencies, exchange rates, tax rules, tariff rules, shipping rules, pricing policies, pricing calculations, pricing snapshots, approvals, audit logs.
+- Keep `agent_tasks` and `events` for later units.
+
+Regression / verification:
+
+Agent can run:
+
+- Generate or run migrations in a development-safe way.
+- Verify schema types compile.
+
+Needs maintainer/manual:
+
+- Confirm whether generated migration files should be committed at this stage.
+- Confirm any table naming preference before later units depend on the schema.
+
+#### Unit 11 — Calculation snapshot persistence
+
+Goal: store enough data to reproduce a pricing result.
+
+- Persist calculation input, output, engine version, policy version, source timestamp, and calculation timestamp.
+- Store original external product payload where appropriate.
+- Keep repository code behind interfaces.
+
+Regression / verification:
+
+Agent can run:
+
+- Add a repository or application test that writes and reads one calculation snapshot.
+
+Needs maintainer/manual:
+
+- None expected unless the implementation reveals an unclear product requirement.
+
+#### Unit 12 — Approval state machine
+
+Goal: model approval transitions before wiring AI actions.
+
+- Add approval states and server-side transition validation.
+- Implement rules for approval-required, rejected, approved, executed, and failed states.
+- Add policy examples such as price change above 10% and missing data blocking execution.
+
+Regression / verification:
+
+Agent can run:
+
+- Add tests for allowed and rejected state transitions.
+
+Needs maintainer/manual:
+
+- None expected unless the implementation reveals an unclear product requirement.
+
+#### Unit 13 — Audit logging
+
+Goal: make important actions traceable.
+
+- Add audit log writing for calculation creation, approval request, approval decision, execution, rejection, and failure.
+- Include actor, action, timestamp, target, and before/after values where relevant.
+- Avoid storing secrets or raw prompts that may contain sensitive data.
+
+Regression / verification:
+
+Agent can run:
+
+- Add a test or local scenario that produces an audit trail for one approval flow.
+
+Needs maintainer/manual:
+
+- None expected unless the implementation reveals an unclear product requirement.
+
+#### Unit 14 — AI provider adapter skeleton
+
+Goal: isolate Gemini-specific code before implementing agent behavior.
+
+- Add `LlmProvider` interface.
+- Add Gemini provider adapter with model name read from environment variables.
+- Keep prompts, provider configuration, and tool execution separate.
+- Do not let provider code call repositories or mutate domain state directly.
+
+Regression / verification:
+
+Agent can run:
+
+- Add a mocked provider test or compile-time check using the interface.
+
+Needs maintainer/manual:
+
+- Provide or confirm real Gemini environment variables before any live provider call.
+- Confirm that live API calls are allowed for the current task before running them.
+
+#### Unit 15 — AI input context builder
+
+Goal: prepare strongly organized model input.
+
+- Build a context object from user request, product data, pricing rules, policy constraints, and allowed tools.
+- Include explicit forbidden behavior such as inventing rates or bypassing approval.
+- Keep context construction deterministic and testable.
+
+Regression / verification:
+
+Agent can run:
+
+- Add a snapshot-style test or structured assertion for one user request.
+
+Needs maintainer/manual:
+
+- Review whether the model input includes enough business context without exposing unnecessary data.
+- Confirm any prompt wording that represents project positioning or interview narrative.
+
+#### Unit 16 — AI output harness
+
+Goal: validate model output before any tool execution.
+
+- Parse tool calls.
+- Check tool name against the allowlist.
+- Validate tool input with Zod.
+- Route allowed calls to application services.
+- Convert sensitive mutations into approval requests when required.
+
+Regression / verification:
+
+Agent can run:
+
+- Add tests for valid tool calls, unknown tools, invalid input, and approval-required output.
+
+Needs maintainer/manual:
+
+- Review which tool calls should be treated as sensitive mutations.
+- Confirm approval thresholds before the harness enforces them as policy.
+
+#### Unit 17 — First three agent tools
+
+Goal: implement the first useful AI tool set.
+
+- Implement `normalize_product_data`.
+- Implement `calculate_price`.
+- Implement `request_price_approval`.
+- Ensure tools return typed results and log tool calls/failures.
+
+Regression / verification:
+
+Agent can run:
+
+- Add tests using mocked model output and fixture pricing data.
+
+Needs maintainer/manual:
+
+- Confirm the tool result wording shown to users.
+- Confirm whether live model smoke testing is allowed or whether mocked tests are sufficient.
+
+#### Unit 18 — Playwright scraper integration
+
+Goal: add live product collection as an optional integration path.
+
+- Add Playwright dependency and development-only scrape command.
+- Implement only the UNIQLO US adapter for product ID `456009`.
+- Extract public product fields, normalize values, save raw snapshot metadata, and close the browser on all paths.
+- Do not bypass authentication, CAPTCHA, access controls, or rate limits.
+
+Regression / verification:
+
+Agent can run:
+
+- Run the manual scrape command only when appropriate.
+- Keep automated tests fixture-based.
+
+Needs maintainer/manual:
+
+- Confirm that checking the target site's terms, robots guidance, and acceptable-use constraints has been completed.
+- Confirm live scraping is appropriate before running the manual scrape command.
+- Visually inspect a saved screenshot if extraction selectors change or confidence is low.
+
+#### Unit 19 — Product events
+
+Goal: add lightweight product analytics after the core flow works.
+
+- Add event recording for price viewed, breakdown opened, approval approved/rejected, and product draft created.
+- Store assigned experiment variant only after a minimal event table exists.
+- Keep analytics out of pricing decisions.
+
+Regression / verification:
+
+Agent can run:
+
+- Add a local scenario or test that records one event without affecting calculation output.
+
+Needs maintainer/manual:
+
+- Confirm event names and which user interactions matter for the portfolio story.
+- Confirm analytics data should remain local/internal and not use an external provider yet.
+
+#### Unit 20 — End-to-end critical path
+
+Goal: verify the main story from UI input to output.
+
+- Add a Playwright test or manual verification script for the pricing dashboard.
+- Cover product fixture loading, destination selection, price result display, breakdown opening, and warning visibility.
+- Include one mobile or narrow viewport check.
+
+Regression / verification:
+
+Agent can run:
+
+- Run the critical-path test or document any blocker clearly.
+
+Needs maintainer/manual:
+
+- Manually review the final user flow for clarity, especially pricing caveats and approval behavior.
+- Confirm whether the demo is ready to be shown as a portfolio/interview walkthrough.
+
 ---
 
 ## 13. Environment Configuration
