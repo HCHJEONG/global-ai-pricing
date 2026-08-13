@@ -79,6 +79,8 @@ The current price must not be hard-coded as a business rule. The initial fixture
 
 The first vertical slice will load the stored public-product fixture, normalize the result, combine it with seeded exchange-rate, tariff, VAT, and domestic-shipping rules, and display a transparent estimated landed price for Korea. The Playwright scraper is an integration demonstration added after this fixture-based path is stable.
 
+The first product must be treated as the first instance of a generalized product-ingestion and pricing flow, not as a UNIQLO-only special case. Product-specific identifiers, source-page quirks, and brand-specific extraction details should remain in fixtures, normalization code, and scraper adapters. The Pricing Engine must only depend on explicit pricing inputs and must not contain product-ID-specific or retailer-specific branches.
+
 The project should describe this as an **estimated calculation**, not as an official customs determination. Apparel tariff treatment may depend on classification, material, origin, value, and applicable trade rules.
 
 ```mermaid
@@ -439,6 +441,8 @@ The first milestone only needs the first three tools.
 - Every tool has a Zod input schema.
 - Every tool returns a typed result.
 - Tools call application services, not raw database queries.
+- The Agent must not use text-to-SQL to generate executable database queries.
+- Database reads and writes must go through application services and repository interfaces, with authorization, validation, policy checks, and audit logging applied outside the LLM.
 - Pricing tools use the deterministic Pricing Engine.
 - Sensitive mutations require policy validation.
 - Mutations must be idempotent where possible.

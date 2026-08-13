@@ -66,7 +66,8 @@ Avoid overly playful colors, excessive offset shadows, oversized typography, and
 ## Internationalization
 
 - Support Arabic, English, Japanese, Chinese, and Korean.
-- Prefer locale-aware routes such as `ko/`, `en/`, `ar/`, `jp/`, and `cn/`.
+- Use Korean as the default language and primary copywriting source.
+- Prefer locale-aware routes such as `ko/`, `en/`, `ar/`, `ja/`, and `zh/`.
 - Keep shared UI text in i18n translation keys instead of duplicating whole pages per language.
 - Account for Arabic RTL in navigation, alignment, directional icons, spacing, and table behavior.
 - Test long translated strings in compact controls, table headers, badges, and mobile cards.
