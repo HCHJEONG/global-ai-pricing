@@ -18,6 +18,73 @@ export type ExchangeRate = {
   basis: "mid_market" | "provider_quote" | "manual_seed";
   observedAt: string;
   source: string;
+  version?: string;
+};
+
+export type CountryFixture = {
+  code: CountryCode;
+  name: string;
+  defaultCurrency: CurrencyCode;
+  marketRole: "source" | "destination" | "source_and_destination";
+};
+
+export type CurrencyFixture = {
+  code: CurrencyCode;
+  minorUnits: number;
+  symbol: string;
+};
+
+export type TaxRuleFixture = {
+  id: string;
+  country: CountryCode;
+  kind: "vat";
+  rate: Rate;
+  taxableBase: "cost_shipping_tariff";
+  effectiveFrom: string;
+  source: string;
+  sourceObservedAt: string;
+  version: string;
+};
+
+export type TariffRuleFixture = {
+  id: string;
+  sourceCountry: CountryCode;
+  destinationCountry: CountryCode;
+  productCategory: "apparel";
+  rate: Rate;
+  classificationBasis: "category_estimate";
+  determination: "estimate";
+  source: string;
+  sourceObservedAt: string;
+  version: string;
+  disclaimer: string;
+};
+
+export type ShippingRuleFixture = {
+  id: string;
+  sourceCountry: CountryCode;
+  destinationCountry: CountryCode;
+  method: "standard_cross_border";
+  flatCost: Money;
+  effectiveFrom: string;
+  source: string;
+  sourceObservedAt: string;
+  version: string;
+};
+
+export type PricingPolicyFixture = {
+  id: string;
+  version: string;
+  targetMarginRate: Rate;
+  paymentFeeRate: Rate;
+  rounding: {
+    currency: CurrencyCode;
+    incrementMinor: bigint;
+    mode: "nearest" | "up";
+  };
+  effectiveFrom: string;
+  source: string;
+  sourceObservedAt: string;
 };
 
 export type PricingInput = {
