@@ -33,9 +33,9 @@ export type CreateAuditLog = {
 
 export type AuditLogRepository = {
   create(input: CreateAuditLog): Promise<AuditLogRecord>;
+  findRecent(input?: { limit?: number }): Promise<AuditLogRecord[]>;
   findByTarget(input: {
     targetType: AuditTargetType;
     targetId: string;
   }): Promise<AuditLogRecord[]>;
 };
-

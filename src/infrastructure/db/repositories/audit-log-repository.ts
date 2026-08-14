@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { asc, eq } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 
 import type {
   AuditLogRecord,
@@ -71,5 +71,13 @@ export class DrizzleAuditLogRepository implements AuditLogRepository {
 
     return rows.map(toRecord);
   }
-}
 
+  async findRecent(input: { limit?: number } = {}): Promise<AuditLogRecord[]> {
+    const rows = await this.db.query.auditLogs.findMany({
+      limit: input.limit ?? 100,
+      orderBy: [desc(auditLogs.occurredAt)],
+    });
+
+    return rows.map(toRecord);
+  }
+}

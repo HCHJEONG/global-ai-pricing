@@ -51,6 +51,23 @@ type PricingMessages = {
   markets: Record<CountryCode, string>;
 };
 
+type AuditMessages = {
+  action: string;
+  actor: string;
+  after: string;
+  auditLogsTitle: string;
+  before: string;
+  emptyDescription: string;
+  emptyTitle: string;
+  headerDescription: string;
+  historyTitle: string;
+  metadata: string;
+  occurredAt: string;
+  target: string;
+  targetId: string;
+  targetType: string;
+};
+
 const englishMarkets: Record<CountryCode, string> = {
   CN: "China",
   JP: "Japan",
@@ -273,5 +290,95 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
       vat: "VAT 估算",
     },
     markets: englishMarkets,
+  },
+};
+
+export const auditMessages: Record<Locale, AuditMessages> = {
+  ar: {
+    action: "الإجراء",
+    actor: "الفاعل",
+    after: "بعد",
+    auditLogsTitle: "سجل التدقيق",
+    before: "قبل",
+    emptyDescription: "ستظهر هنا عمليات الحساب والموافقة والتنفيذ بعد تسجيلها.",
+    emptyTitle: "لا توجد سجلات تدقيق بعد",
+    headerDescription:
+      "يعرض هذا السجل الإجراءات المهمة مع الفاعل والوقت والهدف وقيم قبل/بعد عند توفرها.",
+    historyTitle: "سجل الموافقة الكامل",
+    metadata: "بيانات إضافية",
+    occurredAt: "الوقت",
+    target: "الهدف",
+    targetId: "معرف الهدف",
+    targetType: "نوع الهدف",
+  },
+  en: {
+    action: "Action",
+    actor: "Actor",
+    after: "After",
+    auditLogsTitle: "Audit Logs",
+    before: "Before",
+    emptyDescription:
+      "Calculation, approval, execution, rejection, and failure records will appear here after they are written.",
+    emptyTitle: "No audit logs yet",
+    headerDescription:
+      "Trace important operations with actor, action, timestamp, target, and before/after values where relevant.",
+    historyTitle: "Full Approval History",
+    metadata: "Metadata",
+    occurredAt: "Time",
+    target: "Target",
+    targetId: "Target ID",
+    targetType: "Target Type",
+  },
+  ja: {
+    action: "操作",
+    actor: "実行者",
+    after: "変更後",
+    auditLogsTitle: "監査ログ",
+    before: "変更前",
+    emptyDescription: "計算、承認、実行、却下、失敗の記録が保存されるとここに表示されます。",
+    emptyTitle: "監査ログはまだありません",
+    headerDescription:
+      "重要な操作を、実行者、操作、時刻、対象、必要な変更前後の値とともに追跡します。",
+    historyTitle: "承認の全履歴",
+    metadata: "メタデータ",
+    occurredAt: "時刻",
+    target: "対象",
+    targetId: "対象ID",
+    targetType: "対象種別",
+  },
+  ko: {
+    action: "액션",
+    actor: "수행자",
+    after: "이후 값",
+    auditLogsTitle: "감사 로그",
+    before: "이전 값",
+    emptyDescription:
+      "계산, 승인, 실행, 거절, 실패 기록이 저장되면 여기에 표시됩니다.",
+    emptyTitle: "아직 감사 로그가 없습니다",
+    headerDescription:
+      "중요 작업을 수행자, 액션, 시각, 대상, 필요한 이전/이후 값과 함께 추적합니다.",
+    historyTitle: "전체 승인 이력",
+    metadata: "메타데이터",
+    occurredAt: "시각",
+    target: "대상",
+    targetId: "대상 ID",
+    targetType: "대상 유형",
+  },
+  zh: {
+    action: "动作",
+    actor: "操作者",
+    after: "之后",
+    auditLogsTitle: "审计日志",
+    before: "之前",
+    emptyDescription: "计算、审批、执行、拒绝和失败记录写入后会显示在这里。",
+    emptyTitle: "还没有审计日志",
+    headerDescription:
+      "用操作者、动作、时间、目标以及相关前后值追踪关键操作。",
+    historyTitle: "完整审批历史",
+    metadata: "元数据",
+    occurredAt: "时间",
+    target: "目标",
+    targetId: "目标 ID",
+    targetType: "目标类型",
   },
 };

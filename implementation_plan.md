@@ -1082,6 +1082,27 @@ Needs maintainer/manual:
 
 - None expected unless the implementation reveals an unclear product requirement.
 
+#### Unit 13A — Audit-log viewer UI
+
+Goal: make audit trails visible in the product workflow.
+
+- Add a locale-aware audit-log viewer route such as `/[locale]/audit-logs`.
+- Show actor, action, timestamp, target, and before/after values in a compact operational table.
+- Add a reusable audit-history panel for approval detail screens so each approval can show its full audit history.
+- Keep sensitive values redacted and avoid exposing raw prompts or secrets.
+- Preserve dark mode, mobile layout, and all five locale routes.
+
+Regression / verification:
+
+Agent can run:
+
+- Add a component or route test where feasible, or run lint/type checks.
+- Manually smoke the audit-log viewer route in at least the default locale.
+
+Needs maintainer/manual:
+
+- Confirm the final approval-detail screen placement when the approval queue UI is implemented.
+
 #### Unit 14 — AI provider adapter skeleton
 
 Goal: isolate Gemini-specific code before implementing agent behavior.
