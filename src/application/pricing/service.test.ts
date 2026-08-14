@@ -26,6 +26,11 @@ describe("pricing application service", () => {
       expect.objectContaining({
         productId: "456009",
         name: "Women's Cotton Oversized Short-Sleeve T-Shirt",
+        rawPrice: {
+          amount: "19.90",
+          currency: "USD",
+          taxPolicy: "exclusive",
+        },
         sourceName: "UNIQLO US",
         sourceMarket: "US",
       }),

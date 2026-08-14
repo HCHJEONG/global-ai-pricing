@@ -205,7 +205,7 @@ export default async function PricingPage({ params }: PricingPageProps) {
           </div>
         </dl>
 
-        <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <section className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
           <PricingEventTracker
             breakdownLabel={messages.breakdownTitle}
             calculatedAt={formatDateTime(result.calculatedAt, locale)}

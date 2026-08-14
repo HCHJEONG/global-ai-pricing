@@ -216,6 +216,7 @@ export function calculateFixturePricingQuoteFromProduct(input: {
   }
 
   const product = parsedProduct.data;
+  const rawPrice = input.product.rawData?.price;
 
   if (product.sourceMarket !== "US") {
     return {
@@ -337,7 +338,10 @@ export function calculateFixturePricingQuoteFromProduct(input: {
 
   return {
     status: "success",
-    product: summarizeProduct(product) as PricingQuoteProductSummary,
+    product: {
+      ...(summarizeProduct(product) as PricingQuoteProductSummary),
+      rawPrice,
+    },
     destinationCountry: input.destinationCountry,
     source: {
       fixtureId: uniqloUsProduct456009Fixture.fixtureId,
