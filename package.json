@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "scrape:uniqlo-us": "tsx scripts/scrape-uniqlo-us.ts",
+    "verify:pricing-critical-path": "tsx scripts/verify-pricing-critical-path.ts",
     "test": "vitest run"
   },
   "dependencies": {

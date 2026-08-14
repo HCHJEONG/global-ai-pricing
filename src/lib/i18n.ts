@@ -24,14 +24,20 @@ type PricingMessages = {
   brand: string;
   breakdownTitle: string;
   calculated: string;
+  dataMode: string;
+  devCommand: string;
   destinationMarket: string;
   engineVersion: string;
   fixture: string;
+  fixtureBacked: string;
   fixtureVersion: string;
   headerDescription: string;
   item: string;
+  integrationPath: string;
+  integrationTitle: string;
   marketRouteNote: string;
   policy: string;
+  playwrightAdapterStatus: string;
   productMetaTitle: string;
   rate: string;
   rawPrice: string;
@@ -89,15 +95,21 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     brand: "العلامة التجارية",
     breakdownTitle: "مكونات السعر",
     calculated: "وقت الحساب",
+    dataMode: "وضع البيانات",
+    devCommand: "أمر التطوير",
     destinationMarket: "سوق الوجهة",
     engineVersion: "إصدار المحرك",
     fixture: "Fixture",
+    fixtureBacked: "Fixture ثابت وقابل للإعادة",
     fixtureVersion: "إصدار Fixture",
     headerDescription:
       "نتيجة أول حساب fixture من البداية إلى النهاية. تعرض الصفحة التكلفة والشحن وسعر الصرف والرسوم والضريبة والهامش وسياسة التقريب من نفس المدخلات القابلة للإعادة.",
     item: "البند",
+    integrationPath: "مسار التكامل",
+    integrationTitle: "حالة التكامل",
     marketRouteNote: "مسارات ja و zh هي لغات، بينما JP و CN تبقيان رموز أسواق.",
     policy: "السياسة",
+    playwrightAdapterStatus: "محول UNIQLO US Playwright موجود للتشغيل بواسطة المشرف.",
     productMetaTitle: "بيانات المنتج",
     rate: "النسبة",
     rawPrice: "السعر الأصلي",
@@ -131,15 +143,21 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     brand: "Brand",
     breakdownTitle: "Price Breakdown",
     calculated: "Calculated",
+    dataMode: "Data mode",
+    devCommand: "Development command",
     destinationMarket: "Destination market",
     engineVersion: "Engine version",
     fixture: "Fixture",
+    fixtureBacked: "Fixture-backed and deterministic",
     fixtureVersion: "Fixture version",
     headerDescription:
       "The first end-to-end fixture pricing result. Product cost, shipping, exchange rate, tariff, VAT, fees, margin, and rounding policy are displayed from repeatable inputs.",
     item: "Item",
+    integrationPath: "Integration path",
+    integrationTitle: "Integration Status",
     marketRouteNote: "ja and zh are language routes; JP and CN remain market codes.",
     policy: "Policy",
+    playwrightAdapterStatus: "UNIQLO US Playwright adapter exists for maintainer-run collection.",
     productMetaTitle: "Product Meta",
     rate: "Rate",
     rawPrice: "Raw price",
@@ -173,15 +191,21 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     brand: "ブランド",
     breakdownTitle: "価格内訳",
     calculated: "計算時刻",
+    dataMode: "データモード",
+    devCommand: "開発コマンド",
     destinationMarket: "販売先市場",
     engineVersion: "エンジン版",
     fixture: "Fixture",
+    fixtureBacked: "Fixtureベースで決定的",
     fixtureVersion: "Fixture版",
     headerDescription:
       "最初のエンドツーエンド fixture 計算結果です。商品原価、配送、為替、関税、VAT、手数料、マージン、丸めポリシーを再現可能な入力から表示します。",
     item: "項目",
+    integrationPath: "連携パス",
+    integrationTitle: "連携状態",
     marketRouteNote: "ja と zh は言語ルートで、JP と CN は市場コードのままです。",
     policy: "ポリシー",
+    playwrightAdapterStatus: "UNIQLO US Playwright adapter is available for maintainer-run collection.",
     productMetaTitle: "商品メタ",
     rate: "料率",
     rawPrice: "元価格",
@@ -215,15 +239,21 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     brand: "브랜드",
     breakdownTitle: "가격 구성",
     calculated: "계산",
+    dataMode: "데이터 모드",
+    devCommand: "개발 명령",
     destinationMarket: "도착 시장",
     engineVersion: "엔진 버전",
     fixture: "Fixture",
+    fixtureBacked: "Fixture 기반 결정적 결과",
     fixtureVersion: "Fixture version",
     headerDescription:
       "첫 end-to-end fixture 계산 결과입니다. 상품 원가, 배송비, 환율, 관세, 부가세, 수수료, 마진, 반올림 정책을 같은 입력에서 재현 가능하게 표시합니다.",
     item: "항목",
+    integrationPath: "통합 경로",
+    integrationTitle: "통합 상태",
     marketRouteNote: "ja와 zh는 언어 라우트이며, JP와 CN은 시장 코드로만 유지합니다.",
     policy: "정책",
+    playwrightAdapterStatus: "UNIQLO US Playwright adapter는 maintainer 실행용으로 준비되어 있습니다.",
     productMetaTitle: "상품 메타",
     rate: "요율",
     rawPrice: "원본 가격",
@@ -262,15 +292,21 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     brand: "品牌",
     breakdownTitle: "价格构成",
     calculated: "计算时间",
+    dataMode: "数据模式",
+    devCommand: "开发命令",
     destinationMarket: "目的市场",
     engineVersion: "引擎版本",
     fixture: "Fixture",
+    fixtureBacked: "Fixture 驱动且确定",
     fixtureVersion: "Fixture 版本",
     headerDescription:
       "第一个端到端 fixture 计算结果。页面用可复现输入展示商品成本、运费、汇率、关税、VAT、手续费、利润和取整策略。",
     item: "项目",
+    integrationPath: "集成路径",
+    integrationTitle: "集成状态",
     marketRouteNote: "ja 和 zh 是语言路由；JP 和 CN 仍只作为市场代码。",
     policy: "策略",
+    playwrightAdapterStatus: "UNIQLO US Playwright adapter is available for maintainer-run collection.",
     productMetaTitle: "商品元数据",
     rate: "费率",
     rawPrice: "原始价格",

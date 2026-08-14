@@ -1,6 +1,7 @@
 import { AlertTriangle, CheckCircle2, ExternalLink, Info, ShieldCheck } from "lucide-react";
 
 import { getFixturePricingQuote } from "@/application/pricing";
+import { PricingEventTracker } from "@/components/pricing/pricing-event-tracker";
 import { ThemeControl } from "@/components/theme/theme-control";
 import { formatMoneyBoundary, moneyToMajorUnitString } from "@/domain/pricing";
 import type { Money, PricingWarningSeverity, Rate } from "@/domain/pricing";
@@ -54,13 +55,18 @@ function StatPanel({
   label,
   value,
   detail,
+  testId,
 }: {
   label: string;
   value: string;
   detail: string;
+  testId?: string;
 }) {
   return (
-    <div className="border-2 border-zinc-950 bg-white p-4 shadow-[4px_4px_0_0_#0f766e] dark:border-zinc-100 dark:bg-zinc-900">
+    <div
+      className="border-2 border-zinc-950 bg-white p-4 shadow-[4px_4px_0_0_#0f766e] dark:border-zinc-100 dark:bg-zinc-900"
+      data-testid={testId}
+    >
       <dt className="text-xs font-bold uppercase text-zinc-500 dark:text-zinc-400">{label}</dt>
       <dd className="mt-2 text-2xl font-black tabular-nums text-zinc-950 dark:text-zinc-50">
         {value}
@@ -167,6 +173,7 @@ export default async function PricingPage({ params }: PricingPageProps) {
           <StatPanel
             detail={`${messages.markets[product.sourceMarket]} to ${messages.markets[quote.destinationCountry]}`}
             label={messages.recommendedPrice}
+            testId="recommended-price"
             value={formatMoney(result.recommendedPrice, locale)}
           />
           <StatPanel
@@ -199,13 +206,20 @@ export default async function PricingPage({ params }: PricingPageProps) {
         </dl>
 
         <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-          <div className="overflow-hidden border-2 border-zinc-950 bg-white dark:border-zinc-100 dark:bg-zinc-900">
-            <div className="flex items-center justify-between border-b-2 border-zinc-950 px-4 py-3 dark:border-zinc-100">
-              <h2 className="text-base font-black">{messages.breakdownTitle}</h2>
-              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
-                {messages.calculated}: {formatDateTime(result.calculatedAt, locale)}
-              </span>
-            </div>
+          <PricingEventTracker
+            breakdownLabel={messages.breakdownTitle}
+            calculatedAt={formatDateTime(result.calculatedAt, locale)}
+            calculatedLabel={messages.calculated}
+            eventContext={{
+              calculationId: `${quote.source.fixtureId}:${result.calculatedAt}`,
+              metadata: {
+                destinationCountry: quote.destinationCountry,
+                fixtureId: quote.source.fixtureId,
+                surface: "pricing_dashboard",
+              },
+              productId: product.productId,
+            }}
+          >
             <div className="overflow-x-auto">
               <table className="w-full min-w-[680px] border-collapse text-sm">
                 <thead className="bg-zinc-100 text-left dark:bg-zinc-800">
@@ -232,7 +246,7 @@ export default async function PricingPage({ params }: PricingPageProps) {
                 </tbody>
               </table>
             </div>
-          </div>
+          </PricingEventTracker>
 
           <aside className="grid content-start gap-4">
             <section className="border-2 border-zinc-950 bg-white dark:border-zinc-100 dark:bg-zinc-900">
@@ -268,6 +282,34 @@ export default async function PricingPage({ params }: PricingPageProps) {
                   </li>
                 ))}
               </ul>
+            </section>
+
+            <section className="border-2 border-zinc-950 bg-white dark:border-zinc-100 dark:bg-zinc-900">
+              <div className="border-b-2 border-zinc-950 px-4 py-3 dark:border-zinc-100">
+                <h2 className="text-base font-black">{messages.integrationTitle}</h2>
+              </div>
+              <dl className="grid gap-3 p-4 text-sm">
+                <div className="grid gap-1 border-b border-zinc-200 pb-3 dark:border-zinc-800">
+                  <dt className="text-xs font-bold uppercase text-zinc-500 dark:text-zinc-400">
+                    {messages.dataMode}
+                  </dt>
+                  <dd className="font-bold text-teal-700 dark:text-teal-300">
+                    {messages.fixtureBacked}
+                  </dd>
+                </div>
+                <div className="grid gap-1 border-b border-zinc-200 pb-3 dark:border-zinc-800">
+                  <dt className="text-xs font-bold uppercase text-zinc-500 dark:text-zinc-400">
+                    {messages.integrationPath}
+                  </dt>
+                  <dd>{messages.playwrightAdapterStatus}</dd>
+                </div>
+                <div className="grid gap-1">
+                  <dt className="text-xs font-bold uppercase text-zinc-500 dark:text-zinc-400">
+                    {messages.devCommand}
+                  </dt>
+                  <dd className="break-all font-mono text-xs">pnpm scrape:uniqlo-us</dd>
+                </div>
+              </dl>
             </section>
           </aside>
         </section>
