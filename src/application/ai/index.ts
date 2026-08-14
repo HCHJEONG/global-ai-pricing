@@ -1,4 +1,5 @@
 export { buildAiInputContext } from "./context";
+export { parseAiToolCalls, runAiToolHarness } from "./harness";
 export { buildPromptMessages } from "./prompts";
 
 export type {
@@ -15,4 +16,9 @@ export type {
   LlmProviderRole,
   LlmToolDefinition,
 } from "./provider";
+export type {
+  AiToolCall,
+  AiToolHarnessResult,
+  RunAiToolHarnessInput,
+} from "./harness";
 export type { LlmToolExecutor } from "./tools";
