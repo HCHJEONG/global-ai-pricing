@@ -125,7 +125,7 @@ export const uniqloUsProduct456009Fixture: SourceProductFixture = {
     productName: "Women's Cotton Oversized Short-Sleeve T-Shirt",
     brand: "UNIQLO",
     price: {
-      amount: "1.90",
+      amount: "19.90",
       currency: "USD",
       taxPolicy: "exclusive",
     },

@@ -102,6 +102,9 @@ export default async function PricingPage({ params }: PricingPageProps) {
 
   const { product, result } = quote;
   const productImage = "https://image.uniqlo.com/UQ/ST3/WesternCommon/imagesgoods/456009/item/goods_63_456009_3x4.jpg";
+  const rawPrice = product.rawPrice
+    ? `${product.rawPrice.currency} ${product.rawPrice.amount}`
+    : "-";
 
   return (
     <main
@@ -172,6 +175,23 @@ export default async function PricingPage({ params }: PricingPageProps) {
             label={messages.engineVersion}
             value={result.engineVersion.replace("pricing-engine-", "")}
           />
+        </dl>
+
+        <dl className="grid gap-4 border-2 border-zinc-950 bg-white p-4 dark:border-zinc-100 dark:bg-zinc-900 sm:grid-cols-2">
+          <div className="border-b border-zinc-200 pb-3 dark:border-zinc-800 sm:border-b-0 sm:border-r sm:pb-0 sm:pr-4">
+            <dt className="text-xs font-bold uppercase text-zinc-500 dark:text-zinc-400">
+              {messages.rawPrice}
+            </dt>
+            <dd className="mt-1 font-mono text-xl font-black tabular-nums">{rawPrice}</dd>
+          </div>
+          <div className="sm:pl-4">
+            <dt className="text-xs font-bold uppercase text-zinc-500 dark:text-zinc-400">
+              {messages.normalizedPrice}
+            </dt>
+            <dd className="mt-1 font-mono text-xl font-black tabular-nums">
+              {formatMoney(product.price, locale)}
+            </dd>
+          </div>
         </dl>
 
         <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">

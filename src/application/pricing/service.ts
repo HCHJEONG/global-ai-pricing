@@ -40,6 +40,12 @@ export type PricingQuoteProductSummary = {
   productId: string;
   name: string;
   brand?: string;
+  price: Money;
+  rawPrice?: {
+    amount: string;
+    currency: Money["currency"];
+    taxPolicy?: "exclusive" | "inclusive" | "unknown";
+  };
   sourceName: string;
   sourceUrl: string;
   sourceMarket: CountryCode;
@@ -114,6 +120,8 @@ function summarizeProduct(
     productId: product.productId,
     name: product.productName,
     brand: product.brand,
+    price: product.price,
+    rawPrice: product.rawData?.price,
     sourceName: product.sourceName,
     sourceUrl: product.sourceUrl,
     sourceMarket: product.sourceMarket,

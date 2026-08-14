@@ -34,7 +34,9 @@ type PricingMessages = {
   policy: string;
   productMetaTitle: string;
   rate: string;
+  rawPrice: string;
   recommendedPrice: string;
+  normalizedPrice: string;
   source: string;
   sourceMarket: string;
   sourceProduct: string;
@@ -74,7 +76,9 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     policy: "السياسة",
     productMetaTitle: "بيانات المنتج",
     rate: "النسبة",
+    rawPrice: "السعر الأصلي",
     recommendedPrice: "السعر المقترح",
+    normalizedPrice: "السعر بعد التطبيع",
     source: "المصدر",
     sourceMarket: "سوق المصدر",
     sourceProduct: "منتج المصدر",
@@ -114,7 +118,9 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     policy: "Policy",
     productMetaTitle: "Product Meta",
     rate: "Rate",
+    rawPrice: "Raw price",
     recommendedPrice: "Recommended Price",
+    normalizedPrice: "Normalized price",
     source: "Source",
     sourceMarket: "Source market",
     sourceProduct: "Source product",
@@ -154,7 +160,9 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     policy: "ポリシー",
     productMetaTitle: "商品メタ",
     rate: "料率",
+    rawPrice: "元価格",
     recommendedPrice: "推奨価格",
+    normalizedPrice: "正規化価格",
     source: "ソース",
     sourceMarket: "仕入元市場",
     sourceProduct: "ソース商品",
@@ -194,7 +202,9 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     policy: "정책",
     productMetaTitle: "상품 메타",
     rate: "요율",
+    rawPrice: "원본 가격",
     recommendedPrice: "권장 판매가",
+    normalizedPrice: "정규화 가격",
     source: "근거",
     sourceMarket: "출처 시장",
     sourceProduct: "Source product",
@@ -239,7 +249,9 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     policy: "策略",
     productMetaTitle: "商品元数据",
     rate: "费率",
+    rawPrice: "原始价格",
     recommendedPrice: "建议售价",
+    normalizedPrice: "标准化价格",
     source: "依据",
     sourceMarket: "来源市场",
     sourceProduct: "来源商品",

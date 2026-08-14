@@ -32,7 +32,7 @@ describe("pricing calculation pipeline", () => {
     );
 
     expect(result.recommendedPrice).toEqual({
-      amountMinor: BigInt(21700),
+      amountMinor: BigInt(61200),
       currency: "KRW",
     });
     expect(result.engineVersion).toBe(PRICING_ENGINE_VERSION);
@@ -41,8 +41,8 @@ describe("pricing calculation pipeline", () => {
     expect(result.breakdown).toEqual([
       expect.objectContaining({
         kind: "product_cost",
-        amount: { amountMinor: BigInt(2622), currency: "KRW" },
-        sourceAmount: { amountMinor: BigInt(190), currency: "USD" },
+        amount: { amountMinor: BigInt(27462), currency: "KRW" },
+        sourceAmount: { amountMinor: BigInt(1990), currency: "USD" },
       }),
       expect.objectContaining({
         kind: "shipping",
@@ -50,19 +50,19 @@ describe("pricing calculation pipeline", () => {
       }),
       expect.objectContaining({
         kind: "tariff",
-        amount: { amountMinor: BigInt(1774), currency: "KRW" },
+        amount: { amountMinor: BigInt(5003), currency: "KRW" },
       }),
       expect.objectContaining({
         kind: "vat",
-        amount: { amountMinor: BigInt(1542), currency: "KRW" },
+        amount: { amountMinor: BigInt(4349), currency: "KRW" },
       }),
       expect.objectContaining({
         kind: "payment_fee",
-        amount: { amountMinor: BigInt(509), currency: "KRW" },
+        amount: { amountMinor: BigInt(1435), currency: "KRW" },
       }),
       expect.objectContaining({
         kind: "margin",
-        amount: { amountMinor: BigInt(4241), currency: "KRW" },
+        amount: { amountMinor: BigInt(11960), currency: "KRW" },
       }),
       expect.objectContaining({
         kind: "discount",
@@ -70,7 +70,7 @@ describe("pricing calculation pipeline", () => {
       }),
       expect.objectContaining({
         kind: "rounding",
-        amount: { amountMinor: BigInt(-14), currency: "KRW" },
+        amount: { amountMinor: BigInt(-35), currency: "KRW" },
       }),
     ]);
     expect(result.assumptions.map((assumption) => assumption.code)).toEqual([
@@ -111,13 +111,13 @@ describe("pricing calculation pipeline", () => {
     );
 
     expect(result.recommendedPrice).toEqual({
-      amountMinor: BigInt(22000),
+      amountMinor: BigInt(62000),
       currency: "KRW",
     });
     expect(result.breakdown.at(-1)).toEqual(
       expect.objectContaining({
         kind: "rounding",
-        amount: { amountMinor: BigInt(286), currency: "KRW" },
+        amount: { amountMinor: BigInt(765), currency: "KRW" },
       }),
     );
     expect(result.warnings).toEqual(

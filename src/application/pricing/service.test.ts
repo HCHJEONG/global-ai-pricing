@@ -38,7 +38,7 @@ describe("pricing application service", () => {
       }),
     );
     expect(quote.result.recommendedPrice).toEqual({
-      amountMinor: BigInt(21700),
+      amountMinor: BigInt(61200),
       currency: "KRW",
     });
     expect(quote.result.warnings).toEqual(

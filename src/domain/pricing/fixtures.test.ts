@@ -103,9 +103,16 @@ describe("UNIQLO product fixture", () => {
       expect.objectContaining({
         productId: "456009",
         brand: "UNIQLO",
+        price: expect.objectContaining({
+          amount: "19.90",
+          currency: "USD",
+        }),
         material: "100% Cotton",
         originCountry: "BD",
       }),
+    );
+    expect(uniqloUsProduct456009Fixture.rawExtractedFields.price.amount).not.toBe(
+      "1.90",
     );
 
     expect(normalized).toEqual(
@@ -115,7 +122,7 @@ describe("UNIQLO product fixture", () => {
         productName: "Women's Cotton Oversized Short-Sleeve T-Shirt",
         productId: "456009",
         brand: "UNIQLO",
-        price: { amountMinor: BigInt(190), currency: "USD" },
+        price: { amountMinor: BigInt(1990), currency: "USD" },
         shippingCost: { amountMinor: BigInt(799), currency: "USD" },
         freeShippingThreshold: { amountMinor: BigInt(9900), currency: "USD" },
         observedAt: uniqloUsProduct456009Fixture.observedAt,
