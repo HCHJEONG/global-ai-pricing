@@ -1212,12 +1212,14 @@ Goal: add lightweight product analytics after the core flow works.
 - Add event recording for price viewed, breakdown opened, approval approved/rejected, and product draft created.
 - Store assigned experiment variant only after a minimal event table exists.
 - Keep analytics out of pricing decisions.
+- Stop at the local event table, repository, and service layer in this unit; wire the first UI interactions in Unit 20 so analytics remains verifiable through the final user flow.
 
 Regression / verification:
 
 Agent can run:
 
 - Add a local scenario or test that records one event without affecting calculation output.
+- Confirm the event service can record `product.price_viewed` with an optional experiment variant and redacted metadata.
 
 Needs maintainer/manual:
 
@@ -1230,6 +1232,16 @@ Goal: verify the main story from UI input to output.
 
 - Add a Playwright test or manual verification script for the pricing dashboard.
 - Cover product fixture loading, destination selection, price result display, breakdown opening, and warning visibility.
+- Expose the Playwright integration status in the UI without turning scraping into an unsafe public action:
+  - show that the current dashboard is fixture-backed and deterministic;
+  - show that the UNIQLO US Playwright adapter exists as a maintainer-run integration path;
+  - display the development command name, such as `pnpm scrape:uniqlo-us`, as read-only operational context;
+  - avoid a public "scrape remote page now" button unless terms, rate limits, failure handling, and operator controls are explicitly approved.
+- Add the minimal product-events connection needed for the portfolio story:
+  - record `product.price_viewed` when the pricing page is viewed;
+  - record `product.breakdown_opened` when the user opens the breakdown;
+  - keep both event writes local/internal and outside the pricing calculation path.
+- Prefer a small API route or server action for event writes, plus a focused client component only where user interaction is required.
 - Include one mobile or narrow viewport check.
 
 Regression / verification:
@@ -1237,6 +1249,7 @@ Regression / verification:
 Agent can run:
 
 - Run the critical-path test or document any blocker clearly.
+- Verify the product event write path records at least one UI-triggered event without changing the displayed pricing result.
 
 Needs maintainer/manual:
 

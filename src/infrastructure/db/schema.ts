@@ -218,6 +218,25 @@ export const auditLogs = sqliteTable(
   (table) => [index("audit_logs_target_idx").on(table.targetType, table.targetId)],
 );
 
+export const productEvents = sqliteTable(
+  "product_events",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    productId: text("product_id"),
+    calculationId: text("calculation_id"),
+    approvalId: text("approval_id"),
+    actorId: text("actor_id"),
+    experimentVariant: text("experiment_variant"),
+    occurredAt: text("occurred_at").notNull(),
+    metadataJson: text("metadata_json"),
+  },
+  (table) => [
+    index("product_events_product_idx").on(table.productId, table.occurredAt),
+    index("product_events_name_idx").on(table.name),
+  ],
+);
+
 export const productRelations = relations(products, ({ one, many }) => ({
   brand: one(brands, {
     fields: [products.brandId],

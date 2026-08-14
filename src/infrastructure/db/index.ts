@@ -7,3 +7,4 @@ export {
 export { seedDatabase } from "./seed";
 export { DrizzleCalculationSnapshotRepository } from "./repositories/calculation-snapshot-repository";
 export { DrizzleAuditLogRepository } from "./repositories/audit-log-repository";
+export { DrizzleProductEventRepository } from "./repositories/product-event-repository";

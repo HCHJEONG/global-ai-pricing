@@ -8,6 +8,13 @@
       "when": 1786679828724,
       "tag": "0000_nappy_vampiro",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1786690800000,
+      "tag": "0001_product_events",
+      "breakpoints": true
     }
   ]
 }

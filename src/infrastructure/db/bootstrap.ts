@@ -173,6 +173,19 @@ const schemaStatements = [
     metadata_json TEXT
   )`,
   `CREATE INDEX IF NOT EXISTS audit_logs_target_idx ON audit_logs (target_type, target_id)`,
+  `CREATE TABLE IF NOT EXISTS product_events (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    product_id TEXT,
+    calculation_id TEXT,
+    approval_id TEXT,
+    actor_id TEXT,
+    experiment_variant TEXT,
+    occurred_at TEXT NOT NULL,
+    metadata_json TEXT
+  )`,
+  `CREATE INDEX IF NOT EXISTS product_events_product_idx ON product_events (product_id, occurred_at)`,
+  `CREATE INDEX IF NOT EXISTS product_events_name_idx ON product_events (name)`,
 ];
 
 export async function bootstrapDatabase(db: DatabaseClient): Promise<void> {
