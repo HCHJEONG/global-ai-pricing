@@ -68,6 +68,13 @@ type AuditMessages = {
   targetType: string;
 };
 
+type ThemeMessages = {
+  dark: string;
+  light: string;
+  system: string;
+  title: string;
+};
+
 const englishMarkets: Record<CountryCode, string> = {
   CN: "China",
   JP: "Japan",
@@ -380,5 +387,38 @@ export const auditMessages: Record<Locale, AuditMessages> = {
     target: "目标",
     targetId: "目标 ID",
     targetType: "目标类型",
+  },
+};
+
+export const themeMessages: Record<Locale, ThemeMessages> = {
+  ar: {
+    dark: "داكن",
+    light: "فاتح",
+    system: "النظام",
+    title: "المظهر",
+  },
+  en: {
+    dark: "Dark",
+    light: "Light",
+    system: "System",
+    title: "Theme",
+  },
+  ja: {
+    dark: "ダーク",
+    light: "ライト",
+    system: "システム",
+    title: "テーマ",
+  },
+  ko: {
+    dark: "다크",
+    light: "라이트",
+    system: "시스템",
+    title: "테마",
+  },
+  zh: {
+    dark: "深色",
+    light: "浅色",
+    system: "系统",
+    title: "主题",
   },
 };

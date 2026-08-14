@@ -1,4 +1,5 @@
 import { AuditHistoryPanel } from "@/components/audit/audit-history-panel";
+import { ThemeControl } from "@/components/theme/theme-control";
 import { bootstrapDatabase } from "@/infrastructure/db/bootstrap";
 import { createDatabaseClient, createSqliteConnection } from "@/infrastructure/db/client";
 import { DrizzleAuditLogRepository } from "@/infrastructure/db/repositories/audit-log-repository";
@@ -31,13 +32,16 @@ export default async function AuditLogsPage({ params }: AuditLogsPageProps) {
       >
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
           <header className="border-b-2 border-zinc-950 pb-5 dark:border-zinc-100">
-            <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase">
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-bold uppercase">
+              <div className="flex flex-wrap items-center gap-2">
               <span className="border-2 border-zinc-950 bg-teal-100 px-2 py-1 text-teal-950 dark:border-zinc-100 dark:bg-teal-300 dark:text-zinc-950">
                 Global AI Pricing
               </span>
               <span className="border border-zinc-400 px-2 py-1 dark:border-zinc-600">
                 {messages.auditLogsTitle}
               </span>
+              </div>
+              <ThemeControl locale={locale} />
             </div>
             <h1 className="mt-4 text-3xl font-black leading-tight sm:text-4xl">
               {messages.auditLogsTitle}

@@ -1,5 +1,11 @@
+export { buildAiInputContext } from "./context";
 export { buildPromptMessages } from "./prompts";
 
+export type {
+  AiInputContext,
+  AiPricingInputContextRequest,
+  BuildAiInputContextInput,
+} from "./context";
 export type { PromptTemplate } from "./prompts";
 export type {
   LlmProvider,
