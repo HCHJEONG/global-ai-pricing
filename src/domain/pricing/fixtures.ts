@@ -3,8 +3,10 @@ import type {
   CountryFixture,
   CurrencyFixture,
   ExchangeRate,
+  NormalizedSourceProduct,
   PricingPolicyFixture,
   ShippingRuleFixture,
+  SourceProductFixture,
   TariffRuleFixture,
   TaxRuleFixture,
 } from "./types";
@@ -110,3 +112,79 @@ export const koreaPricingPolicyFixture: PricingPolicyFixture = {
   source: "Manual portfolio-demo seed for deterministic recommended pricing",
   sourceObservedAt: pricingFixtureMetadata.sourceObservedAt,
 };
+
+export const uniqloUsProduct456009Fixture: SourceProductFixture = {
+  fixtureId: "uniqlo-us-456009-2026-08-14",
+  sourceName: "UNIQLO US",
+  sourceUrl: "https://www.uniqlo.com/us/en/products/E456009-000/00",
+  sourceMarket: "US",
+  observedAt: "2026-08-14T11:12:00.000+09:00",
+  adapterVersion: "uniqlo-us-fixture-adapter-2026-08-14.demo-1",
+  rawExtractedFields: {
+    productId: "456009",
+    productName: "Women's Cotton Oversized Short-Sleeve T-Shirt",
+    brand: "UNIQLO",
+    price: {
+      amount: "1.90",
+      currency: "USD",
+      taxPolicy: "exclusive",
+    },
+    shippingCost: {
+      amount: "7.99",
+      currency: "USD",
+      label: "Standard shipping",
+    },
+    freeShippingThreshold: {
+      amount: "99.00",
+      currency: "USD",
+      label: "Free shipping for purchases over $99 or in-store pickup",
+    },
+    originCountry: "BD",
+    material: "100% Cotton",
+    availability: "Available online; store availability varies by selected store",
+    description:
+      "Oversized cut for a comfortable, relaxed fit. Comfortable 100% cotton with a ribbed neckline.",
+    colors: ["BLUE", "WHITE", "BLACK", "YELLOW"],
+    sizes: ["XXS", "XS", "S", "M", "L", "XL", "XXL"],
+    imageUrl:
+      "https://image.uniqlo.com/UQ/ST3/WesternCommon/imagesgoods/456009/item/goods_63_456009_3x4.jpg",
+  },
+};
+
+export function normalizeSourceProductFixture(
+  fixture: SourceProductFixture,
+): NormalizedSourceProduct {
+  const { rawExtractedFields } = fixture;
+
+  return {
+    sourceUrl: fixture.sourceUrl,
+    sourceName: fixture.sourceName,
+    sourceMarket: fixture.sourceMarket,
+    productName: rawExtractedFields.productName,
+    productId: rawExtractedFields.productId,
+    brand: rawExtractedFields.brand,
+    price: moneyFromMajorUnit(
+      rawExtractedFields.price.amount,
+      rawExtractedFields.price.currency,
+    ),
+    shippingCost: rawExtractedFields.shippingCost
+      ? moneyFromMajorUnit(
+          rawExtractedFields.shippingCost.amount,
+          rawExtractedFields.shippingCost.currency,
+        )
+      : undefined,
+    freeShippingThreshold: rawExtractedFields.freeShippingThreshold
+      ? moneyFromMajorUnit(
+          rawExtractedFields.freeShippingThreshold.amount,
+          rawExtractedFields.freeShippingThreshold.currency,
+        )
+      : undefined,
+    originCountry: rawExtractedFields.originCountry,
+    material: rawExtractedFields.material,
+    availability: rawExtractedFields.availability,
+    description: rawExtractedFields.description,
+    observedAt: fixture.observedAt,
+    adapterVersion: fixture.adapterVersion,
+    rawData: rawExtractedFields,
+  };
+}

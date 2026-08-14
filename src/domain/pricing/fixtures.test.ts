@@ -6,8 +6,10 @@ import {
   currencyFixtures,
   koreaPricingPolicyFixture,
   koreaVatRuleFixture,
+  normalizeSourceProductFixture,
   pricingFixtureMetadata,
   usdKrwExchangeRateFixture,
+  uniqloUsProduct456009Fixture,
   usToKoreaShippingRuleFixture,
 } from "./fixtures";
 
@@ -81,5 +83,45 @@ describe("seeded pricing rule fixtures", () => {
       incrementMinor: BigInt(100),
       mode: "nearest",
     });
+  });
+});
+
+describe("UNIQLO product fixture", () => {
+  it("normalizes the stored public product fixture into the source product shape", () => {
+    const normalized = normalizeSourceProductFixture(uniqloUsProduct456009Fixture);
+
+    expect(uniqloUsProduct456009Fixture).toEqual(
+      expect.objectContaining({
+        sourceName: "UNIQLO US",
+        sourceUrl: "https://www.uniqlo.com/us/en/products/E456009-000/00",
+        sourceMarket: "US",
+        observedAt: expect.stringMatching(/^2026-08-14T/),
+        adapterVersion: expect.stringMatching(/^uniqlo-us-fixture-adapter-/),
+      }),
+    );
+    expect(uniqloUsProduct456009Fixture.rawExtractedFields).toEqual(
+      expect.objectContaining({
+        productId: "456009",
+        brand: "UNIQLO",
+        material: "100% Cotton",
+        originCountry: "BD",
+      }),
+    );
+
+    expect(normalized).toEqual(
+      expect.objectContaining({
+        sourceName: "UNIQLO US",
+        sourceMarket: "US",
+        productName: "Women's Cotton Oversized Short-Sleeve T-Shirt",
+        productId: "456009",
+        brand: "UNIQLO",
+        price: { amountMinor: BigInt(190), currency: "USD" },
+        shippingCost: { amountMinor: BigInt(799), currency: "USD" },
+        freeShippingThreshold: { amountMinor: BigInt(9900), currency: "USD" },
+        observedAt: uniqloUsProduct456009Fixture.observedAt,
+        adapterVersion: uniqloUsProduct456009Fixture.adapterVersion,
+      }),
+    );
+    expect(normalized.rawData).toBe(uniqloUsProduct456009Fixture.rawExtractedFields);
   });
 });

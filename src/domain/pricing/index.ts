@@ -5,6 +5,7 @@ export type {
   CurrencyFixture,
   ExchangeRate,
   Money,
+  NormalizedSourceProduct,
   PriceComponent,
   PriceComponentKind,
   PricingAssumption,
@@ -15,6 +16,7 @@ export type {
   PricingPolicyFixture,
   Rate,
   ShippingRuleFixture,
+  SourceProductFixture,
   TariffRuleFixture,
   TaxRuleFixture,
 } from "./types";
@@ -38,7 +40,9 @@ export {
   currencyFixtures,
   koreaPricingPolicyFixture,
   koreaVatRuleFixture,
+  normalizeSourceProductFixture,
   pricingFixtureMetadata,
   usdKrwExchangeRateFixture,
+  uniqloUsProduct456009Fixture,
   usToKoreaShippingRuleFixture,
 } from "./fixtures";

@@ -87,6 +87,61 @@ export type PricingPolicyFixture = {
   sourceObservedAt: string;
 };
 
+export type SourceProductFixture = {
+  fixtureId: string;
+  sourceName: string;
+  sourceUrl: string;
+  sourceMarket: CountryCode;
+  observedAt: string;
+  adapterVersion: string;
+  rawExtractedFields: {
+    productId: string;
+    productName: string;
+    brand?: string;
+    price: {
+      amount: string;
+      currency: CurrencyCode;
+      taxPolicy?: "exclusive" | "inclusive" | "unknown";
+    };
+    shippingCost?: {
+      amount: string;
+      currency: CurrencyCode;
+      label?: string;
+    };
+    freeShippingThreshold?: {
+      amount: string;
+      currency: CurrencyCode;
+      label?: string;
+    };
+    originCountry?: string;
+    material?: string;
+    availability?: string;
+    description?: string;
+    colors?: string[];
+    sizes?: string[];
+    imageUrl?: string;
+  };
+};
+
+export type NormalizedSourceProduct = {
+  sourceUrl: string;
+  sourceName: string;
+  sourceMarket: CountryCode;
+  productName: string;
+  productId?: string;
+  brand?: string;
+  price: Money;
+  shippingCost?: Money;
+  freeShippingThreshold?: Money;
+  originCountry?: string;
+  material?: string;
+  availability?: string;
+  description?: string;
+  observedAt: string;
+  adapterVersion: string;
+  rawData: SourceProductFixture["rawExtractedFields"];
+};
+
 export type PricingInput = {
   productCost: Money;
   sourceCountry: CountryCode;
