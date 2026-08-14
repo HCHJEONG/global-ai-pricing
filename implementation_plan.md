@@ -1256,6 +1256,447 @@ Needs maintainer/manual:
 - Manually review the final user flow for clarity, especially pricing caveats and approval behavior.
 - Confirm whether the demo is ready to be shown as a portfolio/interview walkthrough.
 
+#### Unit 21 — Scrape run model
+
+Goal: add a durable execution record for every scraper worker attempt.
+
+- Add a `scrape_runs` table to record worker execution boundaries:
+  - `id`;
+  - `adapter_name`;
+  - `adapter_version`;
+  - `target_source`;
+  - `target_product_id`;
+  - `target_url`;
+  - `status`;
+  - `started_at`;
+  - `finished_at`;
+  - `error_code`;
+  - `error_message`;
+  - `metadata_json`.
+- Use a small status vocabulary first: `started`, `succeeded`, `failed`, and `partial`.
+- Keep error details short and operator-useful; never store secrets, full environment files, private keys, cookies, session storage, or authorization headers.
+- Add indexes for recent run inspection by target and status.
+- Add a repository with explicit methods such as:
+  - `startRun`;
+  - `markSucceeded`;
+  - `markFailed`;
+  - `findRecent`;
+  - `findLatestByTarget`.
+- Add an application service that owns scrape run lifecycle transitions and keeps transition timestamps consistent.
+- Treat a run left in `started` for too long as stale only in a later scheduling/observability unit; do not overbuild recovery here.
+
+Regression / verification:
+
+Agent can run:
+
+- Add repository tests for successful run creation and completion.
+- Add repository tests for failed run completion with a redacted/summary error.
+- Confirm run writes do not require Playwright or live network access.
+
+Needs maintainer/manual:
+
+- Confirm the status vocabulary is sufficient for the first production-like worker story.
+- Confirm how much non-sensitive diagnostic metadata should be retained.
+
+#### Unit 22 — Source product snapshot model
+
+Goal: store external product observations so price changes can be displayed over time.
+
+- Add a `source_product_snapshots` table or an equivalently named product observation table.
+- Store at minimum:
+  - `id`;
+  - `scrape_run_id`;
+  - `source_name`;
+  - `source_market_code`;
+  - `source_url`;
+  - `external_product_id`;
+  - `product_name`;
+  - `brand`;
+  - `raw_price_amount`;
+  - `raw_price_currency_code`;
+  - `normalized_price_amount_minor`;
+  - `normalized_price_currency_code`;
+  - `availability`;
+  - `observed_at`;
+  - `adapter_version`;
+  - `raw_payload_json`;
+  - `created_at`.
+- Keep raw payloads useful but bounded; do not store browser state, cookies, local storage, credentials, or full screenshots in the row.
+- Link each snapshot to the scrape run that produced it.
+- Add repository methods for:
+  - inserting a snapshot;
+  - finding the latest snapshot by source/product;
+  - finding the previous snapshot before a given observation;
+  - finding recent snapshot history for a product.
+- Add a small diff helper for source product snapshots, limited to product price, currency, availability, and observed timestamp.
+- Preserve deterministic fixture tests by using seeded/mocked observations.
+
+Regression / verification:
+
+Agent can run:
+
+- Add repository tests for insert and latest lookup.
+- Add tests for previous snapshot lookup and price delta detection.
+- Confirm snapshot persistence handles missing optional product fields without blocking price history.
+
+Needs maintainer/manual:
+
+- Confirm the table name and how long raw payload JSON should be retained.
+- Confirm whether screenshots/debug artifacts should be file-based rather than database-backed.
+
+#### Unit 23 — Worker command skeleton
+
+Goal: create a scraper worker entrypoint that is separate from the Next.js request lifecycle.
+
+- Add `scripts/workers/scrape-products.ts`.
+- Add a package script such as `pnpm worker:scrape-products`.
+- Make the worker runnable from shell, cron, PM2, Docker, or a future AWS scheduler.
+- Default the first target to the UNIQLO US product fixture story:
+  - source: `UNIQLO US`;
+  - product ID: `456009`;
+  - URL: `https://www.uniqlo.com/us/en/products/E456009-000/00`.
+- Support a `--dry-run` mode that exercises target resolution and run lifecycle setup without storing live product snapshots.
+- Support an explicit target argument or environment variable for future extension, but avoid building a broad crawler.
+- Start a scrape run before executing target work and always mark the run succeeded or failed before exit.
+- Use process exit codes consistently:
+  - `0` for completed success;
+  - non-zero for failed worker execution.
+- Keep the worker outside UI-triggered public actions.
+
+Regression / verification:
+
+Agent can run:
+
+- Add a worker test or local scenario using a mocked adapter.
+- Confirm a failed adapter still marks the scrape run failed.
+- Confirm `--dry-run` does not insert product snapshots.
+
+Needs maintainer/manual:
+
+- Confirm whether the first worker should handle one target only or a small allowlisted list.
+- Confirm the initial schedule interval that later PM2/cron configuration should use.
+
+#### Unit 24 — UNIQLO adapter persistence
+
+Goal: persist the existing UNIQLO US Playwright adapter output as source product snapshots.
+
+- Connect the existing UNIQLO US adapter to the worker command.
+- Convert adapter output into the source product snapshot shape from Unit 22.
+- Preserve adapter version and source observed timestamp.
+- Persist the raw extraction payload after sanitization and size control.
+- Ensure browser cleanup runs on every path, including timeout and extraction failure.
+- Record a failed scrape run when adapter execution fails.
+- Record a succeeded scrape run only after all required snapshot writes have completed.
+- Keep live scraping as a maintainer-run integration path; do not add a public scrape button.
+- Do not bypass authentication, CAPTCHA, access controls, rate limits, or target-site restrictions.
+
+Regression / verification:
+
+Agent can run:
+
+- Add automated tests around adapter-output-to-snapshot mapping using fixtures.
+- Add a mocked worker integration test that writes one snapshot from an adapter result.
+- Keep live Playwright execution manual unless explicitly approved.
+
+Needs maintainer/manual:
+
+- Confirm target-site terms, robots guidance, and acceptable-use constraints before live worker execution.
+- Confirm whether live scrape artifacts should include screenshots for debugging.
+
+#### Unit 25 — Snapshot-based pricing service
+
+Goal: extend pricing from fixture-only input to latest collected source snapshots.
+
+- Add a pricing service path that reads the latest source product snapshot for a target product.
+- Convert source product snapshots into the existing normalized product shape used by the Pricing Engine.
+- Include snapshot identifiers in calculation input metadata:
+  - `source_product_snapshot_id`;
+  - `scrape_run_id`;
+  - `source_observed_at`.
+- If no collected snapshot exists, return either a blocked state or a clearly labeled fixture fallback, based on the existing page/demo requirements.
+- Add source freshness warnings:
+  - no snapshot;
+  - stale snapshot;
+  - latest scrape failed but a previous successful snapshot exists.
+- Keep all pricing math inside the existing deterministic Pricing Engine.
+- Ensure scraping failures never directly mutate a displayed price.
+
+Regression / verification:
+
+Agent can run:
+
+- Add service tests for latest-snapshot pricing success.
+- Add service tests for no snapshot, stale snapshot, and previous-success fallback.
+- Confirm calculation output remains reproducible from stored snapshot and policy versions.
+
+Needs maintainer/manual:
+
+- Confirm the stale threshold for product source data.
+- Confirm fixture fallback wording and whether fallback should remain visible in portfolio demos.
+
+#### Unit 26 — Pricing calculation history
+
+Goal: store and compare pricing calculation history produced from product snapshots.
+
+- After a worker stores a source product snapshot, run the pricing service and persist a calculation snapshot.
+- Link pricing calculations to source snapshot/run metadata.
+- Add helpers for:
+  - source price delta;
+  - recommended price delta;
+  - currency-aware percentage change;
+  - changed/unchanged direction.
+- Add repository methods for latest calculation and recent calculation history by product/source.
+- Preserve a clear distinction between:
+  - source product observation history;
+  - pricing calculation history;
+  - product analytics events.
+- Keep analytics events out of pricing decisions and history calculations.
+
+Regression / verification:
+
+Agent can run:
+
+- Add tests for writing a calculation after a mocked snapshot.
+- Add tests for delta helpers, including unchanged price and currency mismatch handling.
+- Confirm repeated same-price observations do not create misleading "price changed" results.
+
+Needs maintainer/manual:
+
+- Confirm whether every scrape should produce a pricing calculation or only changed snapshots should.
+- Confirm how many historical rows should be shown in the UI by default.
+
+#### Unit 27 — Dashboard latest data mode
+
+Goal: make the pricing dashboard read latest collected data while clearly labeling data freshness.
+
+- Update the pricing page/service boundary to request latest snapshot-backed pricing where available.
+- Display a data mode label:
+  - `latest collected snapshot`;
+  - `fixture fallback`;
+  - `stale snapshot`;
+  - `blocked`.
+- Display last collected time, last successful scrape run, adapter version, and source observed timestamp near the relevant pricing result.
+- Keep the Playwright command visible only as read-only operational context.
+- Do not expose a public "scrape now" button.
+- Show source freshness warnings alongside pricing caveats.
+- Preserve dark mode, mobile responsiveness, and all five supported languages.
+- Account for Arabic RTL in the status and metadata layout.
+
+Regression / verification:
+
+Agent can run:
+
+- Add a page/service test or local scenario for latest snapshot mode.
+- Add a fallback scenario with no snapshot.
+- Run lint/type/test checks.
+- When feasible, verify narrow viewport assumptions with the critical-path script.
+
+Needs maintainer/manual:
+
+- Manually review data mode wording in Korean and English first.
+- Confirm whether stale data should be warning severity or blocking severity.
+
+#### Unit 28 — Price change history UI
+
+Goal: show users how source prices and recommended prices changed over time.
+
+- Add a compact history section to the pricing dashboard.
+- Show recent observations/calculations with:
+  - observed time;
+  - source price;
+  - recommended price;
+  - source price delta;
+  - recommended price delta;
+  - data source/run status.
+- Use badges for up/down/unchanged movement.
+- Use a table on desktop and compact cards on mobile if the table becomes too dense.
+- Keep raw payload JSON out of the default UI.
+- Add a focused detail view only if needed for source metadata; do not overbuild a full admin console.
+- Add i18n keys for Korean, English, Japanese, Chinese, and Arabic.
+
+Regression / verification:
+
+Agent can run:
+
+- Add component/page tests or fixture-backed rendering checks for history rows.
+- Verify long translated labels do not overflow compact cards or badges.
+- Verify Arabic RTL alignment assumptions where feasible.
+
+Needs maintainer/manual:
+
+- Confirm whether users should see failed scrape attempts in the main history or only in operational health.
+- Confirm default history depth, such as 10 recent observations.
+
+#### Unit 29 — Worker scheduling contract
+
+Goal: define the scheduling behavior needed before binding it to PM2, cron, systemd, or AWS.
+
+- Add a scheduling contract for `worker:scrape-products`.
+- Define environment variables:
+  - `DATABASE_URL`;
+  - target product IDs or allowlist path;
+  - scrape timeout;
+  - dry-run flag;
+  - stale-run threshold;
+  - optional artifact directory.
+- Add active-run or lock protection so overlapping worker executions do not scrape the same target concurrently.
+- Add stale run recovery rules:
+  - how old `started` runs are treated;
+  - whether the next run may mark them failed;
+  - what metadata is retained.
+- Define exit code behavior for scheduler integration.
+- Decide whether the first scheduler implementation should use PM2 inside a worker container or host-level cron/systemd.
+- Keep the contract scheduler-agnostic where possible.
+
+Regression / verification:
+
+Agent can run:
+
+- Add tests for overlapping run prevention.
+- Add tests for stale run detection or document why it is deferred.
+- Confirm worker exits with non-zero status on unrecoverable failure.
+
+Needs maintainer/manual:
+
+- Choose PM2, host cron/systemd, or AWS EventBridge/ECS for the first production-like scheduler.
+- Confirm the initial scrape interval and acceptable target-site request rate.
+
+#### Unit 30 — Worker runtime image
+
+Goal: prepare a Docker runtime capable of running Playwright scraping on AWS.
+
+- Add a worker-specific Dockerfile or build target.
+- Include Playwright and Chromium runtime dependencies.
+- Prefer keeping the web runtime lean and the worker runtime browser-capable.
+- Ensure the worker image can run:
+  - `pnpm worker:scrape-products --dry-run`;
+  - a browser launch smoke check;
+  - a fixture/mocked scrape path.
+- Add an artifact directory for screenshots or debug captures when adapter confidence is low.
+- Do not include secrets, credentials, or generated private files in the image.
+- Document or script read-only AWS smoke checks for `t3a`.
+- Keep live target scraping behind maintainer approval.
+
+Regression / verification:
+
+Agent can run:
+
+- Build the worker image only when explicitly allowed by the maintainer, because production-like image builds may be heavy.
+- Add local Dockerfile syntax/static checks where feasible.
+- Add a script-level smoke check that verifies Playwright can launch Chromium.
+
+Needs maintainer/manual:
+
+- Confirm whether to use the official Playwright base image or install browser dependencies in the existing Node image.
+- Confirm AWS instance resource limits for Chromium worker execution.
+
+#### Unit 31 — Operational observability
+
+Goal: make scraper and pricing pipeline health visible to maintainers.
+
+- Add service/repository helpers for operational health:
+  - last successful scrape;
+  - last failed scrape;
+  - consecutive failures;
+  - latest snapshot age;
+  - latest calculation age.
+- Add a dashboard data-health panel or maintainer-facing section.
+- Show stale data clearly while continuing to display the last known good price when possible.
+- Keep failure summaries short and non-sensitive.
+- Add audit or product-event records for worker milestones only if they clarify the portfolio story and do not duplicate scrape run records.
+- Do not expose raw environment, cookies, request headers, or browser state.
+
+Regression / verification:
+
+Agent can run:
+
+- Add tests for health summary calculation.
+- Add UI fixture scenarios for healthy, stale, and failing pipeline states.
+- Verify failed scrape summaries do not leak sensitive keys through metadata sanitization.
+
+Needs maintainer/manual:
+
+- Confirm what health state should appear to public viewers versus maintainers only.
+- Confirm whether operational health belongs on the pricing dashboard or a separate route.
+
+#### Unit 32 — Critical path E2E: live snapshot mode
+
+Goal: verify the final story from scheduled collection to dashboard history without requiring unsafe live scraping in automated tests.
+
+- Extend the critical-path verification script or add a new one for snapshot-backed pricing.
+- Use a mocked or fixture scraper path to:
+  - create a scrape run;
+  - write a source product snapshot;
+  - run pricing;
+  - write a pricing calculation snapshot;
+  - load the pricing page;
+  - open the breakdown;
+  - view price history.
+- Include one mobile or narrow viewport check.
+- Verify the displayed source price and recommended price match the stored snapshot/calculation.
+- Verify opening the breakdown does not change displayed pricing output.
+- Verify product event writes remain local/internal and outside pricing decisions.
+
+Regression / verification:
+
+Agent can run:
+
+- Run the snapshot-mode critical path test or document blockers clearly.
+- Run standard unit tests and lint/type checks.
+- Verify the latest snapshot and history UI render with deterministic fixture data.
+
+Needs maintainer/manual:
+
+- Manually review the final walkthrough for portfolio/interview clarity.
+- Confirm whether live UNIQLO scraping should be demonstrated manually after terms/rate-limit review.
+
+#### Unit 33 — Two-container AWS deployment
+
+Goal: plan and implement deployment scripts for separate web and worker containers on `t3a`.
+
+- Inspect the current deployment scripts and Dockerfile layout before editing.
+- Split deployment into two images:
+  - `global-ai-pricing-web:<timestamp>`;
+  - `global-ai-pricing-worker:<timestamp>`.
+- Keep the web container focused on Next.js dashboard/API serving:
+  - public port mapping such as `3400:3000`;
+  - no browser runtime unless required by shared dependencies.
+- Keep the worker container focused on scheduled scraping and snapshot pricing:
+  - no public port;
+  - Playwright/Chromium runtime included;
+  - worker command or PM2-managed scheduled command as entrypoint.
+- Decide and document the shared persistence/env strategy:
+  - `DATABASE_URL`;
+  - SQLite volume or future PostgreSQL connection;
+  - artifact directory;
+  - non-secret runtime configuration.
+- If PM2 remains the chosen scheduler, add a worker-specific ecosystem config and run it with `pm2-runtime`.
+- Preserve rollback by timestamp-tagging images and avoiding automatic image pruning.
+- Update deploy scripts so web replacement and worker replacement are separable.
+- Add read-only post-deploy verification steps:
+  - `docker ps`;
+  - recent web logs;
+  - recent worker logs;
+  - web health/page response;
+  - latest scrape run state.
+- Do not create/modify SSH keys.
+- Do not print secrets, full env files, credentials, cookies, or private keys in logs or final responses.
+- Do not deploy automatically unless the maintainer explicitly asks for deployment.
+
+Regression / verification:
+
+Agent can run:
+
+- Run script syntax checks and local dry-run checks where supported.
+- Inspect generated Docker commands without executing destructive container replacement unless explicitly approved.
+- Verify that worker container configuration does not expose public ports.
+
+Needs maintainer/manual:
+
+- Confirm PM2-in-worker versus host scheduler before finalizing runtime behavior.
+- Confirm final container names, port mapping, volume path, and rollback policy.
+- Approve actual deployment to `t3a`.
+
 ---
 
 ## 13. Environment Configuration
