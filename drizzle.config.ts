@@ -1,0 +1,10 @@
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: "sqlite",
+  schema: "./src/infrastructure/db/schema.ts",
+  out: "./src/infrastructure/db/migrations",
+  dbCredentials: {
+    url: process.env.DATABASE_URL ?? "file:./data/global-ai-pricing.db",
+  },
+});
