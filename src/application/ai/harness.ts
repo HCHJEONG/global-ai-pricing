@@ -55,7 +55,29 @@ export type AiToolHarnessResult =
 export type RunAiToolHarnessInput = {
   response: Pick<LlmProviderResponse, "text" | "raw">;
   tools: LlmToolExecutor[];
+  onToolEvent?: (event: AiToolHarnessEvent) => void | Promise<void>;
 };
+
+export type AiToolHarnessEvent =
+  | {
+      status: "executed";
+      call: AiToolCall;
+      result: unknown;
+    }
+  | {
+      status: "approval_required";
+      call: AiToolCall;
+      approvalRequest: {
+        toolName: string;
+        input: unknown;
+        reason: string;
+      };
+    }
+  | {
+      status: "rejected";
+      call?: AiToolCall;
+      reason: Extract<AiToolHarnessResult, { status: "rejected" }>["reason"];
+    };
 
 type ParsedToolOutput = {
   toolCalls: AiToolCall[];
@@ -112,13 +134,19 @@ export async function runAiToolHarness(
   try {
     parsed = parseAiToolCalls(input.response);
   } catch (error) {
+    const result = {
+      status: "rejected",
+      reason: {
+        code: "INVALID_MODEL_OUTPUT",
+        message: error instanceof Error ? error.message : "Invalid model output.",
+      },
+    } satisfies AiToolHarnessResult;
+
+    await input.onToolEvent?.(result);
+
     return [
       {
-        status: "rejected",
-        reason: {
-          code: "INVALID_MODEL_OUTPUT",
-          message: error instanceof Error ? error.message : "Invalid model output.",
-        },
+        ...result,
       },
     ];
   }
@@ -132,20 +160,24 @@ export async function runAiToolHarness(
       const tool = toolsByName.get(call.name);
 
       if (!tool) {
-        return {
+        const result = {
           status: "rejected",
           call,
           reason: {
             code: "UNKNOWN_TOOL",
             message: `Tool ${call.name} is not in the allowlist.`,
           },
-        };
+        } satisfies AiToolHarnessResult;
+
+        await input.onToolEvent?.(result);
+
+        return result;
       }
 
       const parsedInput = tool.inputSchema.safeParse(call.input);
 
       if (!parsedInput.success) {
-        return {
+        const result = {
           status: "rejected",
           call,
           reason: {
@@ -154,11 +186,15 @@ export async function runAiToolHarness(
               .map((issue) => `${issue.path.join(".") || "input"} ${issue.message}`)
               .join("; "),
           },
-        };
+        } satisfies AiToolHarnessResult;
+
+        await input.onToolEvent?.(result);
+
+        return result;
       }
 
       if (tool.requiresApproval) {
-        return {
+        const result = {
           status: "approval_required",
           call: {
             ...call,
@@ -169,20 +205,28 @@ export async function runAiToolHarness(
             input: parsedInput.data,
             reason: "Sensitive mutation requires approval before execution.",
           },
-        };
+        } satisfies AiToolHarnessResult;
+
+        await input.onToolEvent?.(result);
+
+        return result;
       }
 
       try {
-        return {
+        const result = {
           status: "executed",
           call: {
             ...call,
             input: parsedInput.data,
           },
           result: await tool.execute(parsedInput.data),
-        };
+        } satisfies AiToolHarnessResult;
+
+        await input.onToolEvent?.(result);
+
+        return result;
       } catch (error) {
-        return {
+        const result = {
           status: "rejected",
           call: {
             ...call,
@@ -193,7 +237,11 @@ export async function runAiToolHarness(
             message:
               error instanceof Error ? error.message : "Tool execution failed.",
           },
-        };
+        } satisfies AiToolHarnessResult;
+
+        await input.onToolEvent?.(result);
+
+        return result;
       }
     }),
   );
