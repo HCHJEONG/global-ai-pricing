@@ -245,7 +245,7 @@ export default async function PricingPage({ params }: PricingPageProps) {
                 ].map(([label, value]) => (
                   <div key={label} className="grid gap-1 border-b border-zinc-200 pb-3 last:border-b-0 last:pb-0 dark:border-zinc-800">
                     <dt className="text-xs font-bold uppercase text-zinc-500 dark:text-zinc-400">{label}</dt>
-                    <dd className="leading-5">{value}</dd>
+                    <dd className="break-words leading-5">{value}</dd>
                   </div>
                 ))}
               </dl>
@@ -292,15 +292,15 @@ export default async function PricingPage({ params }: PricingPageProps) {
             <dl className="grid gap-3 p-4 text-sm">
               <div className="flex items-start justify-between gap-4 border-b border-zinc-200 pb-3 dark:border-zinc-800">
                 <dt className="font-bold">{messages.fixture}</dt>
-                <dd className="text-right font-mono text-xs">{quote.source.fixtureId}</dd>
+                <dd className="min-w-0 break-all text-right font-mono text-xs">{quote.source.fixtureId}</dd>
               </div>
               <div className="flex items-start justify-between gap-4 border-b border-zinc-200 pb-3 dark:border-zinc-800">
                 <dt className="font-bold">{messages.fixtureVersion}</dt>
-                <dd className="text-right font-mono text-xs">{quote.source.fixtureVersion}</dd>
+                <dd className="min-w-0 break-all text-right font-mono text-xs">{quote.source.fixtureVersion}</dd>
               </div>
               <div className="flex items-start justify-between gap-4 border-b border-zinc-200 pb-3 dark:border-zinc-800">
                 <dt className="font-bold">{messages.policy}</dt>
-                <dd className="text-right font-mono text-xs">{result.policyVersion}</dd>
+                <dd className="min-w-0 break-all text-right font-mono text-xs">{result.policyVersion}</dd>
               </div>
               <div className="flex items-start justify-between gap-4">
                 <dt className="flex items-center gap-2 font-bold">
