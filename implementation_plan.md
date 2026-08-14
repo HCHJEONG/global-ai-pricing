@@ -952,6 +952,8 @@ Goal: expose pricing through a small server-side use case.
 
 - Add an application service that loads fixture inputs and calls the pricing engine.
 - Validate input parameters with Zod where external input is accepted.
+- Validate normalized source-product inputs before calculation: missing product ID/name/source metadata should fail clearly, missing or unsupported price/currency should return a blocking state, and optional fields such as shipping, origin, material, availability, and description should become explicit warnings or documented fallbacks instead of being silently guessed.
+- If product shipping is missing, use the seeded shipping rule only when the destination scenario supports it and include a warning that fixture/rule shipping was used. If origin or material is missing, keep tariff/customs behavior estimate-only and include a warning about reduced confidence.
 - Return a UI-ready result shape without leaking infrastructure details.
 
 Regression / verification:
@@ -959,6 +961,7 @@ Regression / verification:
 Agent can run:
 
 - Add a service-level test or a small route-handler test if the framework setup supports it.
+- Add service-level tests for missing required product price/currency, missing shipping fallback, and missing origin/material warnings.
 
 Needs maintainer/manual:
 

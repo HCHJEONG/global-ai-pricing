@@ -35,6 +35,13 @@ export {
 export type { MoneyRoundingMode } from "./money";
 
 export {
+  calculateLandedPrice,
+  PRICING_ENGINE_VERSION,
+} from "./engine";
+
+export type { CalculatePricingOptions } from "./engine";
+
+export {
   apparelTariffEstimateFixture,
   countryFixtures,
   currencyFixtures,

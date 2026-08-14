@@ -153,6 +153,7 @@ export type PricingInput = {
   paymentFeeRate: Rate;
   targetMarginRate: Rate;
   discountRate?: Rate;
+  rounding: PricingPolicyFixture["rounding"];
   pricingPolicyVersion: string;
 };
 
