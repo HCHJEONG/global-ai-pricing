@@ -1,6 +1,7 @@
 import { AlertTriangle, CheckCircle2, ExternalLink, Info, ShieldCheck } from "lucide-react";
 
 import { getFixturePricingQuote } from "@/application/pricing";
+import { AskAiPanel } from "@/components/pricing/ask-ai-panel";
 import { PricingEventTracker } from "@/components/pricing/pricing-event-tracker";
 import { ThemeControl } from "@/components/theme/theme-control";
 import { formatMoneyBoundary, moneyToMajorUnitString } from "@/domain/pricing";
@@ -210,6 +211,18 @@ export default async function PricingPage({ params }: PricingPageProps) {
             </dd>
           </div>
         </dl>
+
+        <AskAiPanel
+          labels={{
+            answerLabel: messages.askAiAnswer,
+            errorLabel: messages.askAiError,
+            helper: messages.askAiHelper,
+            placeholder: messages.askAiPlaceholder,
+            submit: messages.askAiSubmit,
+            title: messages.askAiTitle,
+          }}
+          locale={locale}
+        />
 
         <section className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
           <PricingEventTracker

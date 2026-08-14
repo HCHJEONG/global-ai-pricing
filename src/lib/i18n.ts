@@ -20,6 +20,12 @@ export function getLocaleDirection(locale: Locale): "ltr" | "rtl" {
 
 type PricingMessages = {
   adapter: string;
+  askAiAnswer: string;
+  askAiError: string;
+  askAiHelper: string;
+  askAiPlaceholder: string;
+  askAiSubmit: string;
+  askAiTitle: string;
   assumptionsTitle: string;
   assumptionMessages: Record<string, string>;
   availability: string;
@@ -100,6 +106,14 @@ const englishMarkets: Record<CountryCode, string> = {
 export const pricingMessages: Record<Locale, PricingMessages> = {
   ar: {
     adapter: "المحول",
+    askAiAnswer: "إجابة AI",
+    askAiError: "تعذر على AI الإجابة",
+    askAiHelper:
+      "يشرح AI نتيجة السعر الحالية فقط. لا يغير السعر ولا يتجاوز الموافقات.",
+    askAiPlaceholder:
+      "مثال: لماذا السعر المقترح 61,200 KRW؟ أي جزء من السعر له أكبر أثر؟ هل تقديرات الرسوم وVAT موثوقة؟",
+    askAiSubmit: "اسأل AI",
+    askAiTitle: "اسأل AI",
     assumptionsTitle: "الافتراضات",
     assumptionMessages: {
       CALCULATION_ORDER:
@@ -170,6 +184,14 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
   },
   en: {
     adapter: "Adapter",
+    askAiAnswer: "AI answer",
+    askAiError: "AI could not answer",
+    askAiHelper:
+      "AI explains only the current pricing result. It cannot change prices or bypass approvals.",
+    askAiPlaceholder:
+      "Example: Why is the recommended price KRW 61,200? Which component drives it most? How reliable are the tariff/VAT estimates?",
+    askAiSubmit: "Ask AI",
+    askAiTitle: "Ask AI",
     assumptionsTitle: "Assumptions",
     assumptionMessages: {
       CALCULATION_ORDER:
@@ -240,6 +262,14 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
   },
   ja: {
     adapter: "アダプター",
+    askAiAnswer: "AIの回答",
+    askAiError: "AIが回答できませんでした",
+    askAiHelper:
+      "AIは現在の価格結果のみを説明します。価格変更や承認の回避はできません。",
+    askAiPlaceholder:
+      "例: 推奨価格が61,200 KRWなのはなぜ？ どの項目の影響が大きい？ 関税/VAT見積はどの程度信頼できる？",
+    askAiSubmit: "AIに質問",
+    askAiTitle: "Ask AI",
     assumptionsTitle: "前提",
     assumptionMessages: {
       CALCULATION_ORDER:
@@ -310,6 +340,14 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
   },
   ko: {
     adapter: "어댑터",
+    askAiAnswer: "AI 답변",
+    askAiError: "AI가 답변하지 못했습니다",
+    askAiHelper:
+      "AI는 현재 표시된 가격 결과만 설명합니다. 가격을 변경하거나 승인 절차를 우회하지 않습니다.",
+    askAiPlaceholder:
+      "예: 왜 권장 판매가가 61,200원인가요? 어떤 항목이 가장 크게 반영됐나요? 관세/VAT 추정은 얼마나 믿을 수 있나요?",
+    askAiSubmit: "AI에게 묻기",
+    askAiTitle: "Ask AI",
     assumptionsTitle: "가정",
     assumptionMessages: {
       CALCULATION_ORDER:
@@ -385,6 +423,14 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
   },
   zh: {
     adapter: "适配器",
+    askAiAnswer: "AI 回答",
+    askAiError: "AI 无法回答",
+    askAiHelper:
+      "AI 只解释当前价格结果，不能修改价格或绕过审批。",
+    askAiPlaceholder:
+      "例：为什么建议售价是 61,200 KRW？哪个构成影响最大？关税/VAT 估算有多可靠？",
+    askAiSubmit: "询问 AI",
+    askAiTitle: "Ask AI",
     assumptionsTitle: "假设",
     assumptionMessages: {
       CALCULATION_ORDER:
