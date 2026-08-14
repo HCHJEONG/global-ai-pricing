@@ -194,6 +194,9 @@ export default async function PricingPage({ params }: PricingPageProps) {
               {messages.rawPrice}
             </dt>
             <dd className="mt-1 font-mono text-xl font-black tabular-nums">{rawPrice}</dd>
+            <dd className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+              {messages.rawPriceDetail}
+            </dd>
           </div>
           <div className="sm:pl-4">
             <dt className="text-xs font-bold uppercase text-zinc-500 dark:text-zinc-400">
@@ -201,6 +204,9 @@ export default async function PricingPage({ params }: PricingPageProps) {
             </dt>
             <dd className="mt-1 font-mono text-xl font-black tabular-nums">
               {formatMoney(product.price, locale)}
+            </dd>
+            <dd className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+              {messages.normalizedPriceDetail}
             </dd>
           </div>
         </dl>
@@ -210,6 +216,7 @@ export default async function PricingPage({ params }: PricingPageProps) {
             breakdownLabel={messages.breakdownTitle}
             calculatedAt={formatDateTime(result.calculatedAt, locale)}
             calculatedLabel={messages.calculated}
+            closeLabel={messages.breakdownCloseLabel}
             eventContext={{
               calculationId: `${quote.source.fixtureId}:${result.calculatedAt}`,
               metadata: {
@@ -219,6 +226,7 @@ export default async function PricingPage({ params }: PricingPageProps) {
               },
               productId: product.productId,
             }}
+            openLabel={messages.breakdownOpenLabel}
           >
             <div className="overflow-x-auto">
               <table className="w-full min-w-[680px] border-collapse text-sm">
@@ -239,7 +247,11 @@ export default async function PricingPage({ params }: PricingPageProps) {
                       </td>
                       <td className="px-4 py-3 text-right font-mono tabular-nums">{formatRate(item.rate)}</td>
                       <td className="max-w-[280px] px-4 py-3 text-zinc-600 dark:text-zinc-300">
-                        {item.note ?? (item.sourceAmount ? `${messages.source} ${formatMoney(item.sourceAmount, locale)}` : "-")}
+                        {messages.componentNotes[item.kind] ??
+                          item.note ??
+                          (item.sourceAmount
+                            ? `${messages.source} ${formatMoney(item.sourceAmount, locale)}`
+                            : "-")}
                       </td>
                     </tr>
                   ))}
@@ -258,8 +270,8 @@ export default async function PricingPage({ params }: PricingPageProps) {
                   [messages.brand, product.brand ?? "-"],
                   [messages.sourceMarket, messages.markets[product.sourceMarket]],
                   [messages.destinationMarket, messages.markets[quote.destinationCountry]],
-                  ["Availability", product.availability ?? "-"],
-                  ["Adapter", product.adapterVersion],
+                  [messages.availability, product.availability ?? "-"],
+                  [messages.adapter, product.adapterVersion],
                 ].map(([label, value]) => (
                   <div key={label} className="grid gap-1 border-b border-zinc-200 pb-3 last:border-b-0 last:pb-0 dark:border-zinc-800">
                     <dt className="text-xs font-bold uppercase text-zinc-500 dark:text-zinc-400">{label}</dt>
@@ -278,7 +290,9 @@ export default async function PricingPage({ params }: PricingPageProps) {
                 {result.assumptions.map((assumption) => (
                   <li key={assumption.code} className="border border-zinc-300 p-3 text-sm dark:border-zinc-700">
                     <strong className="text-xs">{assumption.code}</strong>
-                    <p className="mt-1 leading-5 text-zinc-700 dark:text-zinc-300">{assumption.message}</p>
+                    <p className="mt-1 leading-5 text-zinc-700 dark:text-zinc-300">
+                      {messages.assumptionMessages[assumption.code] ?? assumption.message}
+                    </p>
                   </li>
                 ))}
               </ul>
@@ -324,7 +338,9 @@ export default async function PricingPage({ params }: PricingPageProps) {
               {result.warnings.map((warning) => (
                 <li key={warning.code} className={`border p-3 text-sm ${severityClass(warning.severity)}`}>
                   <strong className="text-xs uppercase">{warning.severity} · {warning.code}</strong>
-                  <p className="mt-1 leading-5">{warning.message}</p>
+                  <p className="mt-1 leading-5">
+                    {messages.warningMessages[warning.code] ?? warning.message}
+                  </p>
                 </li>
               ))}
             </ul>

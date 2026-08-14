@@ -19,7 +19,12 @@ export function getLocaleDirection(locale: Locale): "ltr" | "rtl" {
 }
 
 type PricingMessages = {
+  adapter: string;
   assumptionsTitle: string;
+  assumptionMessages: Record<string, string>;
+  availability: string;
+  breakdownCloseLabel: string;
+  breakdownOpenLabel: string;
   blockedTitle: string;
   brand: string;
   breakdownTitle: string;
@@ -41,8 +46,10 @@ type PricingMessages = {
   productMetaTitle: string;
   rate: string;
   rawPrice: string;
+  rawPriceDetail: string;
   recommendedPrice: string;
   normalizedPrice: string;
+  normalizedPriceDetail: string;
   source: string;
   sourceMarket: string;
   sourceProduct: string;
@@ -54,7 +61,9 @@ type PricingMessages = {
   viewSource: string;
   warningsTitle: string;
   componentLabels: Record<PriceComponentKind, string>;
+  componentNotes: Partial<Record<PriceComponentKind, string>>;
   markets: Record<CountryCode, string>;
+  warningMessages: Record<string, string>;
 };
 
 type AuditMessages = {
@@ -90,7 +99,17 @@ const englishMarkets: Record<CountryCode, string> = {
 
 export const pricingMessages: Record<Locale, PricingMessages> = {
   ar: {
+    adapter: "المحول",
     assumptionsTitle: "الافتراضات",
+    assumptionMessages: {
+      CALCULATION_ORDER:
+        "يتم تحويل تكلفة المنتج والشحن أولاً، ثم تقدير الرسوم والضريبة قبل الرسوم والهامش والخصم والتقريب.",
+      EXCHANGE_RATE_BASIS: "يستخدم هذا العرض سعر USD/KRW تجريبي ثابت، وليس سعراً حياً.",
+      ROUNDING_POLICY: "يتم تقريب السعر المقترح إلى أقرب 100 KRW.",
+    },
+    availability: "التوفر",
+    breakdownCloseLabel: "إخفاء المكونات",
+    breakdownOpenLabel: "عرض المكونات",
     blockedTitle: "تم إيقاف حساب السعر",
     brand: "العلامة التجارية",
     breakdownTitle: "مكونات السعر",
@@ -113,8 +132,10 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     productMetaTitle: "بيانات المنتج",
     rate: "النسبة",
     rawPrice: "السعر الأصلي",
+    rawPriceDetail: "كما ظهر في بيانات المصدر",
     recommendedPrice: "السعر المقترح",
     normalizedPrice: "السعر بعد التطبيع",
+    normalizedPriceDetail: "قيمة منظمة يستخدمها محرك التسعير",
     source: "المصدر",
     sourceMarket: "سوق المصدر",
     sourceProduct: "منتج المصدر",
@@ -135,10 +156,30 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
       tariff: "تقدير الرسوم",
       vat: "تقدير الضريبة",
     },
+    componentNotes: {
+      rounding: "تقريب إلى أقرب 100 KRW",
+      tariff: "تقدير حسب فئة المنتج، وليس قراراً جمركياً رسمياً.",
+      vat: "يطبق على تكلفة المنتج والشحن وتقدير الرسوم.",
+    },
     markets: englishMarkets,
+    warningMessages: {
+      CUSTOMS_ESTIMATE_ONLY:
+        "الرسوم وVAT تقديرات للعرض التجريبي وليست نصيحة جمركية أو ضريبية رسمية.",
+      STALE_EXCHANGE_RATE: "سعر الصرف المستخدم قديم مقارنة بوقت الحساب.",
+    },
   },
   en: {
+    adapter: "Adapter",
     assumptionsTitle: "Assumptions",
+    assumptionMessages: {
+      CALCULATION_ORDER:
+        "Cost and shipping are converted first; tariff and VAT are estimated before fee, margin, discount, and rounding.",
+      EXCHANGE_RATE_BASIS: "This demo uses a fixed USD/KRW seed rate, not a live FX quote.",
+      ROUNDING_POLICY: "Recommended price is rounded to the nearest 100 KRW.",
+    },
+    availability: "Availability",
+    breakdownCloseLabel: "Hide breakdown",
+    breakdownOpenLabel: "Show breakdown",
     blockedTitle: "Pricing calculation is blocked",
     brand: "Brand",
     breakdownTitle: "Price Breakdown",
@@ -161,8 +202,10 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     productMetaTitle: "Product Meta",
     rate: "Rate",
     rawPrice: "Raw price",
+    rawPriceDetail: "As extracted from the source fixture",
     recommendedPrice: "Recommended Price",
     normalizedPrice: "Normalized price",
+    normalizedPriceDetail: "Structured value used by the pricing engine",
     source: "Source",
     sourceMarket: "Source market",
     sourceProduct: "Source product",
@@ -183,10 +226,30 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
       tariff: "Tariff estimate",
       vat: "VAT estimate",
     },
+    componentNotes: {
+      rounding: "Rounded to the nearest 100 KRW",
+      tariff: "Estimated from product category, not an official customs ruling.",
+      vat: "Applied to product cost, shipping, and tariff estimate.",
+    },
     markets: englishMarkets,
+    warningMessages: {
+      CUSTOMS_ESTIMATE_ONLY:
+        "Tariff and VAT are portfolio-demo estimates and are not official customs or tax advice.",
+      STALE_EXCHANGE_RATE: "The exchange-rate observation is stale for this calculation.",
+    },
   },
   ja: {
+    adapter: "アダプター",
     assumptionsTitle: "前提",
+    assumptionMessages: {
+      CALCULATION_ORDER:
+        "商品原価と配送費を先に換算し、関税とVATを見積もった後に手数料、マージン、割引、丸めを適用します。",
+      EXCHANGE_RATE_BASIS: "このデモは固定のUSD/KRWシードレートを使用し、ライブ為替ではありません。",
+      ROUNDING_POLICY: "推奨価格は100 KRW単位に丸めます。",
+    },
+    availability: "在庫状況",
+    breakdownCloseLabel: "内訳を隠す",
+    breakdownOpenLabel: "内訳を見る",
     blockedTitle: "価格計算がブロックされました",
     brand: "ブランド",
     breakdownTitle: "価格内訳",
@@ -209,8 +272,10 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     productMetaTitle: "商品メタ",
     rate: "料率",
     rawPrice: "元価格",
+    rawPriceDetail: "ソースfixtureから抽出された表示値",
     recommendedPrice: "推奨価格",
     normalizedPrice: "正規化価格",
+    normalizedPriceDetail: "価格エンジンが使用する構造化された値",
     source: "ソース",
     sourceMarket: "仕入元市場",
     sourceProduct: "ソース商品",
@@ -231,10 +296,30 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
       tariff: "関税見積",
       vat: "VAT見積",
     },
+    componentNotes: {
+      rounding: "100 KRW単位に丸め",
+      tariff: "商品カテゴリに基づく見積で、公式な税関判断ではありません。",
+      vat: "商品原価、配送費、関税見積に適用します。",
+    },
     markets: englishMarkets,
+    warningMessages: {
+      CUSTOMS_ESTIMATE_ONLY:
+        "関税とVATはポートフォリオデモ用の見積で、公式な税関・税務助言ではありません。",
+      STALE_EXCHANGE_RATE: "この計算で使用した為替観測値は古くなっています。",
+    },
   },
   ko: {
+    adapter: "어댑터",
     assumptionsTitle: "가정",
+    assumptionMessages: {
+      CALCULATION_ORDER:
+        "상품 원가와 배송비를 먼저 환산한 뒤, 관세와 부가세를 추정하고 수수료, 마진, 할인, 반올림을 적용합니다.",
+      EXCHANGE_RATE_BASIS: "이 데모는 실시간 환율이 아닌 고정 USD/KRW seed 환율을 사용합니다.",
+      ROUNDING_POLICY: "권장 판매가는 100원 단위로 반올림합니다.",
+    },
+    availability: "판매 상태",
+    breakdownCloseLabel: "가격 구성 닫기",
+    breakdownOpenLabel: "가격 구성 보기",
     blockedTitle: "가격 계산이 차단되었습니다",
     brand: "브랜드",
     breakdownTitle: "가격 구성",
@@ -257,8 +342,10 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     productMetaTitle: "상품 메타",
     rate: "요율",
     rawPrice: "원본 가격",
+    rawPriceDetail: "소스 fixture에서 추출한 표시값",
     recommendedPrice: "권장 판매가",
     normalizedPrice: "정규화 가격",
+    normalizedPriceDetail: "가격 엔진이 사용하는 구조화된 값",
     source: "근거",
     sourceMarket: "출처 시장",
     sourceProduct: "Source product",
@@ -279,15 +366,35 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
       tariff: "관세 추정",
       vat: "부가세 추정",
     },
+    componentNotes: {
+      rounding: "100원 단위 반올림",
+      tariff: "상품 카테고리 기반 추정치이며 공식 통관 판단이 아닙니다.",
+      vat: "상품 원가, 배송비, 관세 추정액에 적용합니다.",
+    },
     markets: {
       CN: "중국",
       JP: "일본",
       KR: "한국",
       US: "미국",
     },
+    warningMessages: {
+      CUSTOMS_ESTIMATE_ONLY:
+        "관세와 부가세는 포트폴리오 데모용 추정치이며 공식 통관 또는 세무 자문이 아닙니다.",
+      STALE_EXCHANGE_RATE: "이 계산에 사용한 환율 관측값이 오래되었습니다.",
+    },
   },
   zh: {
+    adapter: "适配器",
     assumptionsTitle: "假设",
+    assumptionMessages: {
+      CALCULATION_ORDER:
+        "先换算商品成本和运费，再估算关税和VAT，然后应用手续费、利润、折扣和取整。",
+      EXCHANGE_RATE_BASIS: "此演示使用固定 USD/KRW 种子汇率，不是实时外汇报价。",
+      ROUNDING_POLICY: "建议售价取整到最接近的 100 KRW。",
+    },
+    availability: "可售状态",
+    breakdownCloseLabel: "隐藏构成",
+    breakdownOpenLabel: "查看构成",
     blockedTitle: "价格计算已阻止",
     brand: "品牌",
     breakdownTitle: "价格构成",
@@ -310,8 +417,10 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     productMetaTitle: "商品元数据",
     rate: "费率",
     rawPrice: "原始价格",
+    rawPriceDetail: "从来源 fixture 提取的显示值",
     recommendedPrice: "建议售价",
     normalizedPrice: "标准化价格",
+    normalizedPriceDetail: "定价引擎使用的结构化数值",
     source: "依据",
     sourceMarket: "来源市场",
     sourceProduct: "来源商品",
@@ -332,7 +441,17 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
       tariff: "关税估算",
       vat: "VAT 估算",
     },
+    componentNotes: {
+      rounding: "取整到最接近的 100 KRW",
+      tariff: "基于商品类别的估算，不是官方海关裁定。",
+      vat: "应用于商品成本、运费和关税估算。",
+    },
     markets: englishMarkets,
+    warningMessages: {
+      CUSTOMS_ESTIMATE_ONLY:
+        "关税和VAT是作品集演示估算，不是官方海关或税务建议。",
+      STALE_EXCHANGE_RATE: "本次计算使用的汇率观测值已经过期。",
+    },
   },
 };
 

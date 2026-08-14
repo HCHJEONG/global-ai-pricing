@@ -21,7 +21,9 @@ type PricingEventTrackerProps = {
   calculatedLabel: string;
   calculatedAt: string;
   children: React.ReactNode;
+  closeLabel: string;
   eventContext: Omit<ProductEventPayload, "name">;
+  openLabel: string;
 };
 
 function recordProductEvent(payload: ProductEventPayload): void {
@@ -39,7 +41,9 @@ export function PricingEventTracker({
   calculatedLabel,
   calculatedAt,
   children,
+  closeLabel,
   eventContext,
+  openLabel,
 }: PricingEventTrackerProps) {
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false);
   const didRecordBreakdownOpen = useRef(false);
@@ -77,7 +81,7 @@ export function PricingEventTracker({
               aria-hidden="true"
               className={`h-4 w-4 transition-transform ${isBreakdownOpen ? "rotate-180" : ""}`}
             />
-            {breakdownLabel}
+            {isBreakdownOpen ? closeLabel : openLabel}
           </Button>
         </div>
       </div>
