@@ -111,7 +111,7 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     askAiHelper:
       "يشرح AI نتيجة السعر الحالية فقط. لا يغير السعر ولا يتجاوز الموافقات.",
     askAiPlaceholder:
-      "مثال: لماذا السعر المقترح 61,200 KRW؟ أي جزء من السعر له أكبر أثر؟ هل تقديرات الرسوم وVAT موثوقة؟",
+      "مثال: إذا بعنا هذا المنتج في كوريا، ما السعر النهائي المقترح ولماذا حُسب بهذه الطريقة؟",
     askAiSubmit: "اسأل AI",
     askAiTitle: "اسأل AI",
     assumptionsTitle: "الافتراضات",
@@ -189,7 +189,7 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     askAiHelper:
       "AI explains only the current pricing result. It cannot change prices or bypass approvals.",
     askAiPlaceholder:
-      "Example: Why is the recommended price KRW 61,200? Which component drives it most? How reliable are the tariff/VAT estimates?",
+      "Example: If we sell this product in Korea, what is the final recommended price and why was it calculated that way?",
     askAiSubmit: "Ask AI",
     askAiTitle: "Ask AI",
     assumptionsTitle: "Assumptions",
@@ -267,7 +267,7 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     askAiHelper:
       "AIは現在の価格結果のみを説明します。価格変更や承認の回避はできません。",
     askAiPlaceholder:
-      "例: 推奨価格が61,200 KRWなのはなぜ？ どの項目の影響が大きい？ 関税/VAT見積はどの程度信頼できる？",
+      "例: この商品を韓国で販売する場合、最終的な推奨価格はいくらで、なぜその計算になる？",
     askAiSubmit: "AIに質問",
     askAiTitle: "Ask AI",
     assumptionsTitle: "前提",
@@ -345,7 +345,7 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     askAiHelper:
       "AI는 현재 표시된 가격 결과만 설명합니다. 가격을 변경하거나 승인 절차를 우회하지 않습니다.",
     askAiPlaceholder:
-      "예: 왜 권장 판매가가 61,200원인가요? 어떤 항목이 가장 크게 반영됐나요? 관세/VAT 추정은 얼마나 믿을 수 있나요?",
+      "이 상품을 한국에 팔면 최종 추천가는 얼마고, 왜 그렇게 계산됐어?",
     askAiSubmit: "AI에게 묻기",
     askAiTitle: "Ask AI",
     assumptionsTitle: "가정",
@@ -428,7 +428,7 @@ export const pricingMessages: Record<Locale, PricingMessages> = {
     askAiHelper:
       "AI 只解释当前价格结果，不能修改价格或绕过审批。",
     askAiPlaceholder:
-      "例：为什么建议售价是 61,200 KRW？哪个构成影响最大？关税/VAT 估算有多可靠？",
+      "例：如果把这件商品卖到韩国，最终建议售价是多少，为什么这样计算？",
     askAiSubmit: "询问 AI",
     askAiTitle: "Ask AI",
     assumptionsTitle: "假设",
