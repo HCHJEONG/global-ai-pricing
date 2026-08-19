@@ -11,6 +11,7 @@ set -euo pipefail
 : "${GCP_KEY_ON_PRIVATE:=${APP_DIR_ON_PRIVATE}/gcp-key.json}"
 : "${DATA_DIR_ON_PRIVATE:=${APP_DIR_ON_PRIVATE}/data}"
 : "${DATABASE_URL:=file:/app/data/global-ai-pricing.db}"
+: "${HEALTH_CHECK_PATH:=/ko/pricing}"
 : "${CONTAINER_NAME:=pricingai}"
 : "${CONTAINER_PORT:=3000}"
 : "${HOST_PORT:=3400}"
@@ -81,6 +82,7 @@ ssh "${SSH_OPTS[@]}" "$BASTION_HOST" \
   GCP_KEY_ON_PRIVATE="$GCP_KEY_ON_PRIVATE" \
   DATA_DIR_ON_PRIVATE="$DATA_DIR_ON_PRIVATE" \
   DATABASE_URL="$DATABASE_URL" \
+  HEALTH_CHECK_PATH="$HEALTH_CHECK_PATH" \
   IMAGE="$IMAGE" \
   CONTAINER_NAME="$CONTAINER_NAME" \
   HOST_PORT="$HOST_PORT" \
@@ -104,6 +106,7 @@ ssh -i ~/.ssh/penvotkeypair1.pem -o StrictHostKeyChecking=accept-new "$PRIVATE_H
   bash -s <<'PRIVATE_SCRIPT'
 set -euo pipefail
 echo "[private] loading image and replacing container: $CONTAINER_NAME"
+DOCKER="sudo docker"
 if [ ! -d "$APP_DIR_ON_PRIVATE" ]; then
   echo "[private] missing app dir: $APP_DIR_ON_PRIVATE" >&2
   exit 1
@@ -122,10 +125,10 @@ if [ ! -d "$DATA_DIR_ON_PRIVATE" ]; then
 fi
 mkdir -p "$REMOTE_BASE_DIR/images"
 mv "$PRIVATE_TAR" "$REMOTE_BASE_DIR/images/"
-docker load -i "$REMOTE_BASE_DIR/images/$(basename "$PRIVATE_TAR")"
+$DOCKER load -i "$REMOTE_BASE_DIR/images/$(basename "$PRIVATE_TAR")"
 rm -f "$REMOTE_BASE_DIR/images/$(basename "$PRIVATE_TAR")"
-docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
-docker run -d --restart unless-stopped --name "$CONTAINER_NAME" \
+$DOCKER rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
+$DOCKER run -d --restart unless-stopped --name "$CONTAINER_NAME" \
   -p "0.0.0.0:${HOST_PORT}:${CONTAINER_PORT}" \
   --env-file "$ENV_FILE_ON_PRIVATE" \
   -e DATABASE_URL="$DATABASE_URL" \
@@ -133,17 +136,17 @@ docker run -d --restart unless-stopped --name "$CONTAINER_NAME" \
   -v "${DATA_DIR_ON_PRIVATE}:/app/data" \
   -v "${GCP_KEY_ON_PRIVATE}:/app/gcp-key.json:ro" \
   "$IMAGE"
-if ! docker ps --filter "name=^/$CONTAINER_NAME$" --filter status=running --format '{{.Names}}' | grep -qx "$CONTAINER_NAME"; then
+if ! $DOCKER ps --filter "name=^/$CONTAINER_NAME$" --filter status=running --format '{{.Names}}' | grep -qx "$CONTAINER_NAME"; then
   echo "[private] container did not enter running state" >&2
-  docker ps -a --filter "name=^/$CONTAINER_NAME$"
-  docker logs --tail 80 "$CONTAINER_NAME" || true
+  $DOCKER ps -a --filter "name=^/$CONTAINER_NAME$"
+  $DOCKER logs --tail 80 "$CONTAINER_NAME" || true
   exit 1
 fi
 echo "[private] container is running"
-docker ps --filter "name=^/$CONTAINER_NAME$" --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
+$DOCKER ps --filter "name=^/$CONTAINER_NAME$" --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
 health_ready=0
 for attempt in $(seq 1 30); do
-  if curl -fsS --max-time 5 "http://127.0.0.1:${HOST_PORT}/" >/dev/null; then
+  if curl -fsS --max-time 5 "http://127.0.0.1:${HOST_PORT}${HEALTH_CHECK_PATH}" >/dev/null; then
     health_ready=1
     break
   fi
@@ -151,8 +154,8 @@ for attempt in $(seq 1 30); do
   sleep 2
 done
 if [ "$health_ready" -ne 1 ]; then
-  echo "[private] health check failed on http://127.0.0.1:${HOST_PORT}/" >&2
-  docker logs --tail 80 "$CONTAINER_NAME" || true
+  echo "[private] health check failed on http://127.0.0.1:${HOST_PORT}${HEALTH_CHECK_PATH}" >&2
+  $DOCKER logs --tail 80 "$CONTAINER_NAME" || true
   exit 1
 fi
 echo "[private] HTTP health check passed"
