@@ -15,5 +15,3 @@ data
 .env*
 gcp-key.json
 .fordeploy/aws-backup
-!.env.local
-!gcp-key.json

@@ -2,58 +2,26 @@
 set -euo pipefail
 
 : "${BASTION_HOST:=ubuntu@43.202.136.180}"
-: "${PRIVATE_HOST:=ubuntu@172.31.68.164}"
+: "${PRIVATE_HOST:=ubuntu@172.31.76.194}"
 : "${BASTION_SSH_KEY:=${HOME}/.ssh/penvotkeypair1.pem}"
 : "${REMOTE_PORT:=22}"
-: "${REMOTE_BASE_DIR:=/home/ubuntu/docker_images/global-ai-pricing}"
+: "${REMOTE_BASE_DIR:=/home/ubuntu/docker_images/pricingai}"
+: "${APP_DIR_ON_PRIVATE:=/home/ubuntu/pricingai}"
+: "${ENV_FILE_ON_PRIVATE:=${APP_DIR_ON_PRIVATE}/.env.local}"
+: "${GCP_KEY_ON_PRIVATE:=${APP_DIR_ON_PRIVATE}/gcp-key.json}"
+: "${DATA_DIR_ON_PRIVATE:=${APP_DIR_ON_PRIVATE}/data}"
+: "${DATABASE_URL:=file:/app/data/global-ai-pricing.db}"
 : "${CONTAINER_NAME:=pricingai}"
 : "${CONTAINER_PORT:=3000}"
 : "${HOST_PORT:=3400}"
-: "${MEDIUM_INSTANCE_ID:=i-0c66613ecf80dc3cb}"
+: "${MEDIUM_INSTANCE_ID:=i-0fa95bb4eff77caf2}"
 : "${CONFIGURE_ALB:=0}"
-: "${PRICING_AI_ENV_FILE_SOURCE:=/mnt/j/VSCodeProjects/global-ai-pricing/.fordeploy/aws-backup/.env.local}"
-: "${PRICING_AI_GCP_KEY_SOURCE:=/mnt/j/VSCodeProjects/global-ai-pricing/.fordeploy/aws-backup/gcp-key.json}"
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 
 log() {
   printf '[global-ai-pricing] %s\n' "$*"
-}
-
-ENV_LOCAL_BACKUP=""
-GCP_KEY_BACKUP=""
-
-restore_local_secret_files() {
-  if [ -n "$ENV_LOCAL_BACKUP" ]; then
-    mv -f "$ENV_LOCAL_BACKUP" "$ROOT_DIR/.env.local"
-  else
-    rm -f "$ROOT_DIR/.env.local"
-  fi
-
-  if [ -n "$GCP_KEY_BACKUP" ]; then
-    mv -f "$GCP_KEY_BACKUP" "$ROOT_DIR/gcp-key.json"
-  else
-    rm -f "$ROOT_DIR/gcp-key.json"
-  fi
-}
-
-restore_secret_file() {
-  local target="$1"
-  local source="$2"
-  local backup_var_name="$3"
-
-  if [ ! -f "$target" ]; then
-    if [ ! -f "$source" ]; then
-      echo "missing deployment secret source: $source" >&2
-      exit 1
-    fi
-    cp "$source" "$target"
-  else
-    local backup="${target}.bak.$(date +%Y%m%d%H%M%S)"
-    cp "$target" "$backup"
-    printf -v "$backup_var_name" '%s' "$backup"
-  fi
 }
 
 case "$REMOTE_BASE_DIR" in
@@ -63,13 +31,17 @@ case "$REMOTE_BASE_DIR" in
     ;;
 esac
 
+case "$APP_DIR_ON_PRIVATE" in
+  ""|/|/home|/home/ubuntu)
+    echo "APP_DIR_ON_PRIVATE must be a dedicated application directory" >&2
+    exit 1
+    ;;
+esac
+
 if [ ! -f "$BASTION_SSH_KEY" ]; then
   echo "missing Bastion SSH key: $BASTION_SSH_KEY" >&2
   exit 1
 fi
-
-restore_secret_file "$ROOT_DIR/.env.local" "$PRICING_AI_ENV_FILE_SOURCE" ENV_LOCAL_BACKUP
-restore_secret_file "$ROOT_DIR/gcp-key.json" "$PRICING_AI_GCP_KEY_SOURCE" GCP_KEY_BACKUP
 
 IMAGE_NAME="global-ai-pricing"
 IMAGE_TAG="$(date +%Y%m%d%H%M%S)"
@@ -81,7 +53,6 @@ PRIVATE_TAR="/home/ubuntu/$IMAGE_BASENAME"
 
 cleanup() {
   rm -f "$IMAGE_FILE"
-  restore_local_secret_files
 }
 trap cleanup EXIT
 
@@ -105,6 +76,11 @@ ssh "${SSH_OPTS[@]}" "$BASTION_HOST" \
   BASTION_TAR="$BASTION_TAR" \
   PRIVATE_TAR="$PRIVATE_TAR" \
   REMOTE_BASE_DIR="$REMOTE_BASE_DIR" \
+  APP_DIR_ON_PRIVATE="$APP_DIR_ON_PRIVATE" \
+  ENV_FILE_ON_PRIVATE="$ENV_FILE_ON_PRIVATE" \
+  GCP_KEY_ON_PRIVATE="$GCP_KEY_ON_PRIVATE" \
+  DATA_DIR_ON_PRIVATE="$DATA_DIR_ON_PRIVATE" \
+  DATABASE_URL="$DATABASE_URL" \
   IMAGE="$IMAGE" \
   CONTAINER_NAME="$CONTAINER_NAME" \
   HOST_PORT="$HOST_PORT" \
@@ -116,6 +92,11 @@ scp -i ~/.ssh/penvotkeypair1.pem -o StrictHostKeyChecking=accept-new "$BASTION_T
 ssh -i ~/.ssh/penvotkeypair1.pem -o StrictHostKeyChecking=accept-new "$PRIVATE_HOST" \
   PRIVATE_TAR="$PRIVATE_TAR" \
   REMOTE_BASE_DIR="$REMOTE_BASE_DIR" \
+  APP_DIR_ON_PRIVATE="$APP_DIR_ON_PRIVATE" \
+  ENV_FILE_ON_PRIVATE="$ENV_FILE_ON_PRIVATE" \
+  GCP_KEY_ON_PRIVATE="$GCP_KEY_ON_PRIVATE" \
+  DATA_DIR_ON_PRIVATE="$DATA_DIR_ON_PRIVATE" \
+  DATABASE_URL="$DATABASE_URL" \
   IMAGE="$IMAGE" \
   CONTAINER_NAME="$CONTAINER_NAME" \
   HOST_PORT="$HOST_PORT" \
@@ -123,13 +104,35 @@ ssh -i ~/.ssh/penvotkeypair1.pem -o StrictHostKeyChecking=accept-new "$PRIVATE_H
   bash -s <<'PRIVATE_SCRIPT'
 set -euo pipefail
 echo "[private] loading image and replacing container: $CONTAINER_NAME"
+if [ ! -d "$APP_DIR_ON_PRIVATE" ]; then
+  echo "[private] missing app dir: $APP_DIR_ON_PRIVATE" >&2
+  exit 1
+fi
+if [ ! -f "$ENV_FILE_ON_PRIVATE" ]; then
+  echo "[private] missing env file: $ENV_FILE_ON_PRIVATE" >&2
+  exit 1
+fi
+if [ ! -f "$GCP_KEY_ON_PRIVATE" ]; then
+  echo "[private] missing gcp key file: $GCP_KEY_ON_PRIVATE" >&2
+  exit 1
+fi
+if [ ! -d "$DATA_DIR_ON_PRIVATE" ]; then
+  echo "[private] missing data dir: $DATA_DIR_ON_PRIVATE" >&2
+  exit 1
+fi
 mkdir -p "$REMOTE_BASE_DIR/images"
 mv "$PRIVATE_TAR" "$REMOTE_BASE_DIR/images/"
 docker load -i "$REMOTE_BASE_DIR/images/$(basename "$PRIVATE_TAR")"
 rm -f "$REMOTE_BASE_DIR/images/$(basename "$PRIVATE_TAR")"
 docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
 docker run -d --restart unless-stopped --name "$CONTAINER_NAME" \
-  -p "0.0.0.0:${HOST_PORT}:${CONTAINER_PORT}" "$IMAGE"
+  -p "0.0.0.0:${HOST_PORT}:${CONTAINER_PORT}" \
+  --env-file "$ENV_FILE_ON_PRIVATE" \
+  -e DATABASE_URL="$DATABASE_URL" \
+  -e GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-key.json \
+  -v "${DATA_DIR_ON_PRIVATE}:/app/data" \
+  -v "${GCP_KEY_ON_PRIVATE}:/app/gcp-key.json:ro" \
+  "$IMAGE"
 if ! docker ps --filter "name=^/$CONTAINER_NAME$" --filter status=running --format '{{.Names}}' | grep -qx "$CONTAINER_NAME"; then
   echo "[private] container did not enter running state" >&2
   docker ps -a --filter "name=^/$CONTAINER_NAME$"

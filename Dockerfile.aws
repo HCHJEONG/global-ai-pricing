@@ -22,8 +22,5 @@ RUN pnpm install --frozen-lockfile --prod
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.ts ./next.config.ts
-COPY .env.local ./.env.local
-COPY gcp-key.json ./gcp-key.json
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-key.json
 EXPOSE 3000
 CMD ["pnpm", "start"]

@@ -3,7 +3,7 @@
 This folder follows the deployment shape used by the neighboring
 `legacy-lang-intelligence` repository.
 
-Expected structure:
+Expected local structure:
 
 ```text
 .fordeploy/
@@ -14,15 +14,19 @@ Expected structure:
     gcp-key.json
 ```
 
-Deployment scripts should restore `.env.local` and `gcp-key.json` from absolute
-source paths before `docker build`, include them in the AWS image, and then
-remove or restore the temporary root copies after the build.
+The AWS image must not include `.env.local`, `gcp-key.json`, or the SQLite DB.
+Runtime-only files live on the private host and are attached at `docker run`
+time with `--env-file` and bind mounts.
 
-Default local secret source paths for this repository should be:
+Expected runtime structure on yws:
 
 ```text
-/mnt/j/VSCodeProjects/global-ai-pricing/.fordeploy/aws-backup/.env.local
-/mnt/j/VSCodeProjects/global-ai-pricing/.fordeploy/aws-backup/gcp-key.json
+/home/ubuntu/pricingai/
+  .env.local
+  gcp-key.json
+  data/
+    global-ai-pricing.db
 ```
 
-Do not commit `.env.local`, `gcp-key.json`, image archives, or copied secrets.
+Do not commit `.env.local`, `gcp-key.json`, image archives, DB files, or copied
+secrets.
