@@ -6,6 +6,7 @@ import unittest
 
 SCRIPT = (Path(__file__).parents[1] / "deploy-aws.sh").read_text()
 PRIVATE = SCRIPT.split("bash -s <<'PRIVATE_SCRIPT'\n", 1)[1].split("\nPRIVATE_SCRIPT", 1)[0]
+BASTION = SCRIPT.split("bash -s <<'BASTION_SCRIPT'\n", 1)[1].split("\nBASTION_SCRIPT", 1)[0]
 
 
 class DeploymentTests(unittest.TestCase):
@@ -65,6 +66,18 @@ esac
         self.assertFalse(any(c.startswith("rm ") or c.startswith("run ") for c in calls))
 
     def test_shell_syntax(self):
-        for script in (SCRIPT, PRIVATE, SCRIPT.split("bash -s <<'BASTION_SCRIPT'\n", 1)[1].split("\nBASTION_SCRIPT", 1)[0]):
+        for script in (SCRIPT, PRIVATE, BASTION):
             result = subprocess.run(["bash", "-n"], input=script, text=True, capture_output=True)
             self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_bastion_command_only_ssh_detaches_stdin(self):
+        self.assertIn(
+            'ssh -n -i ~/.ssh/penvotkeypair1.pem -o StrictHostKeyChecking=accept-new "$PRIVATE_HOST" \\\n'
+            '  "mkdir -p -- \'$REMOTE_BASE_DIR\'"',
+            BASTION,
+        )
+        self.assertIn(
+            'ssh -n -i ~/.ssh/penvotkeypair1.pem -o ConnectTimeout=10 '
+            '-o StrictHostKeyChecking=accept-new "$PRIVATE_HOST"',
+            BASTION,
+        )

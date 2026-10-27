@@ -156,13 +156,15 @@ exec 9>"$REMOTE_BASE_DIR/.deploy.lock"
 flock -n 9 || { echo "Another pricing deployment is running" >&2; exit 1; }
 cleanup_transfer() {
   rm -f -- "$BASTION_TAR"
-  ssh -i ~/.ssh/penvotkeypair1.pem -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new "$PRIVATE_HOST" \
+  ssh -n -i ~/.ssh/penvotkeypair1.pem -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new "$PRIVATE_HOST" \
     "rm -f -- '$PRIVATE_TAR'" || echo "[bastion] WARNING: private archive cleanup failed" >&2
 }
 trap cleanup_transfer EXIT
 # Recover archives left by interrupted processes, only in this dedicated directory.
 find "$REMOTE_BASE_DIR" -maxdepth 1 -type f -name 'global-ai-pricing-*.tar' -mmin +10080 -delete
-ssh -i ~/.ssh/penvotkeypair1.pem -o StrictHostKeyChecking=accept-new "$PRIVATE_HOST" \
+# The Bastion shell is reading this deployment from stdin. A nested SSH that
+# only runs a command must detach stdin or it can consume the remaining script.
+ssh -n -i ~/.ssh/penvotkeypair1.pem -o StrictHostKeyChecking=accept-new "$PRIVATE_HOST" \
   "mkdir -p -- '$REMOTE_BASE_DIR'"
 echo "[bastion] transferring image to private host: $PRIVATE_HOST"
 scp -i ~/.ssh/penvotkeypair1.pem -o StrictHostKeyChecking=accept-new "$BASTION_TAR" "$PRIVATE_HOST:$PRIVATE_TAR"
